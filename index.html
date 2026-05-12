@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>الذكاء الاصطناعي والجرائم الإلكترونية الحديثة</title>
+<title>الذكاء الاصطناعي والجرائم الإلكترونية · مايو 2026</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
 
@@ -16,644 +16,783 @@
     --text: #e8f4f8;
     --text-muted: #8aa0b8;
     --glow: 0 0 30px rgba(0,212,255,0.3);
-    --glow-purple: 0 0 30px rgba(123,47,247,0.3);
+    --green: #10B981;
+    --gold: #ffd740;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  html, body {
-    height: 100%;
-    font-family: 'Cairo', sans-serif;
-    background: var(--bg-dark);
-    color: var(--text);
-    overflow: hidden;
-  }
+  html, body { height: 100%; font-family: 'Cairo', sans-serif; background: var(--bg-dark); color: var(--text); overflow: hidden; }
 
   body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background:
-      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
-    background-size: 50px 50px;
-    pointer-events: none;
-    z-index: 0;
+    content: ''; position: fixed; inset: 0;
+    background: linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),
+                linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);
+    background-size: 50px 50px; pointer-events: none; z-index: 0;
   }
 
-  .slides-container {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    z-index: 1;
-  }
-
+  /* ── SLIDES ── */
+  .slides-container { position: relative; width: 100vw; height: 100vh; z-index: 1; }
   .slide {
-    position: absolute; inset: 0;
-    display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
-    padding: 40px 60px;
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; padding: 40px 60px;
     opacity: 0; transform: translateX(-60px);
-    transition: all 0.6s cubic-bezier(0.4,0,0.2,1);
+    transition: all 0.55s cubic-bezier(0.4,0,0.2,1);
     pointer-events: none; overflow-y: auto;
   }
-  .slide.active { opacity: 1; transform: translateX(0); pointer-events: all; }
-  .slide.exit { opacity: 0; transform: translateX(60px); }
+  .slide.active  { opacity: 1; transform: translateX(0); pointer-events: all; }
+  .slide.exit    { opacity: 0; transform: translateX(60px); }
 
-  .slide-counter {
-    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-    display: flex; gap: 8px; z-index: 100;
-  }
-  .dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: rgba(0,212,255,0.25); cursor: pointer; transition: all 0.3s;
-  }
-  .dot.active {
-    background: var(--primary); box-shadow: 0 0 10px var(--primary);
-    width: 24px; border-radius: 4px;
-  }
-
+  /* ── NAV ── */
   .nav-btn {
     position: fixed; top: 50%; transform: translateY(-50%);
     background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3);
-    color: var(--primary); width: 50px; height: 50px;
-    border-radius: 50%; cursor: pointer; font-size: 20px;
-    transition: all 0.3s; z-index: 100;
+    color: var(--primary); width: 50px; height: 50px; border-radius: 50%;
+    cursor: pointer; font-size: 22px; transition: all 0.3s; z-index: 100;
     display: flex; align-items: center; justify-content: center;
   }
-  .nav-btn:hover {
-    background: rgba(0,212,255,0.2); box-shadow: var(--glow);
-    transform: translateY(-50%) scale(1.1);
-  }
+  .nav-btn:hover { background: rgba(0,212,255,0.2); box-shadow: var(--glow); transform: translateY(-50%) scale(1.1); }
   .nav-prev { right: 20px; }
   .nav-next { left: 20px; }
+  .slide-num   { position:fixed; top:20px; left:30px; font-size:12px; color:var(--text-muted); z-index:100; letter-spacing:2px; }
+  .key-hint    { position:fixed; top:20px; right:30px; font-size:11px; color:rgba(255,255,255,0.2); z-index:100; }
 
-  .slide-num {
-    position: fixed; top: 20px; left: 30px;
-    font-size: 12px; color: var(--text-muted); z-index: 100; letter-spacing: 2px;
-  }
-  .key-hint {
-    position: fixed; top: 20px; right: 30px;
-    font-size: 11px; color: rgba(255,255,255,0.2); z-index: 100;
-  }
+  /* ── DOTS ── */
+  .slide-counter { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); display:flex; gap:6px; z-index:100; flex-wrap:wrap; justify-content:center; max-width:90vw; }
+  .dot { width:7px; height:7px; border-radius:50%; background:rgba(0,212,255,0.22); cursor:pointer; transition:all .3s; }
+  .dot.active { background:var(--primary); box-shadow:0 0 8px var(--primary); width:22px; border-radius:4px; }
 
-  h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; line-height: 1.2; }
-  h2 { font-size: clamp(1.5rem, 3.5vw, 2.4rem); font-weight: 700; }
-  h3 { font-size: clamp(1rem, 2.5vw, 1.4rem); font-weight: 600; }
-  p, li { font-size: clamp(0.9rem, 1.8vw, 1.1rem); line-height: 1.8; }
+  /* ── TYPE ── */
+  h1 { font-size:clamp(2rem,5vw,3.5rem); font-weight:900; line-height:1.2; }
+  h2 { font-size:clamp(1.4rem,3vw,2.2rem); font-weight:700; }
+  h3 { font-size:clamp(.9rem,1.8vw,1.1rem); font-weight:600; }
+  p,li { font-size:clamp(.8rem,1.4vw,.94rem); line-height:1.75; }
 
-  .gradient-text {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  }
+  .gradient-text { background:linear-gradient(135deg,var(--primary),var(--secondary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .badge { display:inline-block; padding:4px 14px; border-radius:20px; font-size:.68rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom:14px; }
+  .badge-cyan   { background:rgba(0,212,255,.15); color:var(--primary); border:1px solid rgba(0,212,255,.4); }
+  .badge-red    { background:rgba(255,71,87,.15);  color:var(--accent);  border:1px solid rgba(255,71,87,.4); }
+  .badge-purple { background:rgba(123,47,247,.15); color:#b57bff; border:1px solid rgba(123,47,247,.4); }
+  .divider { width:80px; height:4px; background:linear-gradient(90deg,var(--primary),var(--secondary)); border-radius:2px; margin:12px auto; }
 
-  .badge {
-    display: inline-block; padding: 4px 14px; border-radius: 20px;
-    font-size: 0.75rem; font-weight: 700; letter-spacing: 1px;
-    text-transform: uppercase; margin-bottom: 16px;
-  }
-  .badge-cyan { background: rgba(0,212,255,0.15); color: var(--primary); border: 1px solid rgba(0,212,255,0.4); }
-  .badge-red  { background: rgba(255,71,87,0.15);  color: var(--accent);  border: 1px solid rgba(255,71,87,0.4); }
-  .badge-purple { background: rgba(123,47,247,0.15); color: #b57bff; border: 1px solid rgba(123,47,247,0.4); }
+  /* ── CARDS ── */
+  .card { background:var(--bg-card); border:1px solid rgba(0,212,255,.15); border-radius:16px; padding:18px 22px; backdrop-filter:blur(10px); transition:all .3s; }
+  .card:hover { border-color:rgba(0,212,255,.4); box-shadow:var(--glow); transform:translateY(-2px); }
+  .card-danger  { border-color:rgba(255,71,87,.25); }
+  .card-danger:hover { border-color:rgba(255,71,87,.5); box-shadow:0 0 20px rgba(255,71,87,.2); }
+  .card-purple  { border-color:rgba(123,47,247,.25); }
 
-  .card {
-    background: var(--bg-card); border: 1px solid rgba(0,212,255,0.15);
-    border-radius: 16px; padding: 24px 28px;
-    backdrop-filter: blur(10px); transition: all 0.3s;
-  }
-  .card:hover {
-    border-color: rgba(0,212,255,0.4); box-shadow: var(--glow); transform: translateY(-2px);
-  }
-  .card-danger { border-color: rgba(255,71,87,0.25); }
-  .card-danger:hover { border-color: rgba(255,71,87,0.5); box-shadow: 0 0 20px rgba(255,71,87,0.2); }
-  .card-purple { border-color: rgba(123,47,247,0.25); }
+  /* ── GRIDS ── */
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; width:100%; max-width:1060px; }
+  .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; width:100%; max-width:1060px; }
+  .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; width:100%; max-width:1060px; }
 
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 1100px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; width: 100%; max-width: 1100px; }
-  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; width: 100%; max-width: 1100px; }
-  .icon-big { font-size: 3rem; margin-bottom: 14px; display: block; }
-  .icon-med { font-size: 2rem; margin-bottom: 10px; display: block; }
+  /* ── MISC ── */
+  .slide-inner  { width:100%; max-width:1100px; display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .icon-big { font-size:2.2rem; margin-bottom:8px; display:block; }
+  .icon-med { font-size:1.6rem; margin-bottom:8px; display:block; }
+  .stat-num { font-size:clamp(1.8rem,3.5vw,2.6rem); font-weight:900; background:linear-gradient(135deg,var(--primary),var(--secondary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .quote-box { background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(123,47,247,.08)); border-right:4px solid var(--primary); border-radius:0 12px 12px 0; padding:14px 18px; font-style:italic; font-size:.9rem; color:var(--primary); max-width:800px; width:100%; line-height:2; }
+  .warning-band { background:linear-gradient(135deg,rgba(255,71,87,.1),rgba(255,71,87,.05)); border:1px solid rgba(255,71,87,.3); border-radius:12px; padding:12px 18px; display:flex; align-items:center; gap:12px; width:100%; max-width:900px; margin-top:12px; }
 
-  .styled-list { list-style: none; width: 100%; max-width: 900px; }
-  .styled-list li {
-    padding: 12px 20px; margin-bottom: 10px;
-    background: var(--bg-card); border-right: 3px solid var(--primary);
-    border-radius: 10px; backdrop-filter: blur(5px); transition: all 0.2s;
-  }
-  .styled-list li:hover {
-    border-right-color: var(--secondary); background: rgba(255,255,255,0.07); padding-right: 26px;
-  }
-  .styled-list.danger li { border-right-color: var(--accent); }
+  /* ── LISTS ── */
+  .styled-list { list-style:none; width:100%; max-width:900px; }
+  .styled-list li { padding:9px 16px; margin-bottom:7px; background:var(--bg-card); border-right:3px solid var(--primary); border-radius:10px; backdrop-filter:blur(5px); transition:all .2s; font-size:.85rem; }
+  .styled-list li:hover { border-right-color:var(--secondary); background:rgba(255,255,255,.07); padding-right:22px; }
 
-  .stat-num {
-    font-size: clamp(2rem, 4vw, 3rem); font-weight: 900;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  }
+  /* ── TIMELINE ── */
+  .timeline { width:100%; max-width:900px; }
+  .timeline-item { display:flex; gap:16px; margin-bottom:14px; }
+  .timeline-icon { width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--secondary)); display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; box-shadow:var(--glow); }
 
-  .divider {
-    width: 80px; height: 4px;
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
-    border-radius: 2px; margin: 16px auto;
-  }
+  /* ── THREAT BARS ── */
+  .threat-bar { margin-bottom:11px; }
+  .threat-label { display:flex; justify-content:space-between; margin-bottom:4px; font-size:.8rem; }
+  .bar-track { background:rgba(255,255,255,.08); border-radius:8px; height:8px; overflow:hidden; }
+  .bar-fill { height:100%; border-radius:8px; animation:barIn 1.4s ease forwards; }
+  @keyframes barIn { from{width:0} }
 
-  .timeline { width: 100%; max-width: 900px; }
-  .timeline-item { display: flex; gap: 20px; margin-bottom: 20px; }
-  .timeline-icon {
-    width: 48px; height: 48px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.3rem; flex-shrink: 0; box-shadow: var(--glow);
-  }
-  .timeline-content { flex: 1; }
+  /* ── COVER ── */
+  #slide-0 { text-align:center; background:radial-gradient(ellipse at center,rgba(0,212,255,.06) 0%,transparent 70%); }
+  .pulse-ring { width:100px; height:100px; border-radius:50%; border:2px solid var(--primary); display:flex; align-items:center; justify-content:center; margin:0 auto 20px; animation:ring 2s ease infinite; }
+  @keyframes ring { 0%{box-shadow:0 0 0 0 rgba(0,212,255,.4)} 70%{box-shadow:0 0 0 18px rgba(0,212,255,0)} 100%{box-shadow:0 0 0 0 rgba(0,212,255,0)} }
 
-  .threat-bar { margin-bottom: 14px; }
-  .threat-label { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9rem; }
-  .bar-track { background: rgba(255,255,255,0.08); border-radius: 8px; height: 10px; overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 8px; animation: barIn 1.5s ease forwards; transform-origin: right; }
-  @keyframes barIn { from { width: 0; } }
+  /* ── PRESENTER ── */
+  .presenter-item { text-align:center; background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:16px 32px; backdrop-filter:blur(5px); transition:all .3s; }
+  .presenter-item:hover { border-color:rgba(0,212,255,.3); box-shadow:var(--glow); transform:translateY(-2px); }
+  .presenter-name { font-size:1.15rem; font-weight:700; color:var(--primary); }
 
-  #slide-0 {
-    text-align: center;
-    background: radial-gradient(ellipse at center, rgba(0,212,255,0.06) 0%, transparent 70%);
+  /* ─────────────────────────────────────────────────────────────
+     SLIDE 9 — INTERACTIVE THREAT MAP
+  ───────────────────────────────────────────────────────────── */
+  .map-wrapper {
+    position:relative; width:100%; max-width:900px;
+    background:rgba(5,10,24,.7); border:1px solid rgba(0,212,255,.2);
+    border-radius:20px; padding:18px; backdrop-filter:blur(8px);
   }
-  .pulse-ring {
-    width: 120px; height: 120px; border-radius: 50%;
-    border: 2px solid var(--primary); display: flex;
-    align-items: center; justify-content: center;
-    margin: 0 auto 24px; position: relative;
-    animation: ring 2s ease infinite;
-  }
-  @keyframes ring {
-    0% { box-shadow: 0 0 0 0 rgba(0,212,255,0.4); }
-    70% { box-shadow: 0 0 0 20px rgba(0,212,255,0); }
-    100% { box-shadow: 0 0 0 0 rgba(0,212,255,0); }
+  .map-svg { width:100%; }
+  .atk-dot { cursor:pointer; transition:r .2s; }
+  .atk-dot:hover { r:9; }
+  .atk-pulse { transform-origin:center; animation:pulse 2s infinite; }
+  @keyframes pulse {
+    0%,100%{opacity:.8;r:6}
+    50%{opacity:.2;r:12}
   }
 
-  .warning-band {
-    background: linear-gradient(135deg, rgba(255,71,87,0.1), rgba(255,71,87,0.05));
-    border: 1px solid rgba(255,71,87,0.3); border-radius: 12px; padding: 16px 24px;
-    display: flex; align-items: center; gap: 14px; width: 100%; max-width: 900px; margin-top: 16px;
+  .map-tooltip {
+    position:absolute; background:rgba(5,10,30,.95); border:1px solid rgba(0,212,255,.4);
+    border-radius:10px; padding:10px 14px; font-size:.78rem; pointer-events:none;
+    z-index:10; max-width:180px; box-shadow:var(--glow); display:none;
+    transition:opacity .2s;
   }
+  .map-tooltip.show { display:block; }
+  .map-tooltip h4 { color:var(--primary); margin-bottom:4px; font-size:.82rem; }
+  .map-tooltip p  { color:var(--text-muted); }
 
-  .slide-inner {
-    width: 100%; max-width: 1100px;
-    display: flex; flex-direction: column; align-items: center; gap: 20px;
+  .live-counters {
+    display:flex; gap:18px; margin-bottom:14px; flex-wrap:wrap; justify-content:center;
   }
+  .counter-box {
+    background:var(--bg-card); border:1px solid rgba(0,212,255,.2); border-radius:12px;
+    padding:10px 18px; text-align:center; min-width:120px;
+  }
+  .counter-val { font-size:1.5rem; font-weight:900; color:var(--accent); font-variant-numeric:tabular-nums; }
+  .counter-lbl { font-size:.7rem; color:var(--text-muted); margin-top:2px; }
 
-  .quote-box {
-    background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(123,47,247,0.08));
-    border-right: 4px solid var(--primary); border-radius: 0 12px 12px 0;
-    padding: 20px 24px; font-style: italic; font-size: 1.1rem;
-    color: var(--primary); max-width: 800px; width: 100%; line-height: 2;
-  }
+  .map-legend { display:flex; gap:16px; margin-top:10px; flex-wrap:wrap; justify-content:center; }
+  .legend-item { display:flex; align-items:center; gap:6px; font-size:.75rem; color:var(--text-muted); }
+  .legend-dot  { width:10px; height:10px; border-radius:50%; }
 
-  /* ─── المقدمون (أسماء ظاهرة) ─── */
-  .presenters {
-    margin-top: 28px;
-    display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; align-items: center;
+  /* ─────────────────────────────────────────────────────────────
+     SLIDE 10 — INTERACTIVE DEFENSE
+  ───────────────────────────────────────────────────────────── */
+  .tab-row {
+    display:flex; gap:8px; background:rgba(255,255,255,.04); border-radius:12px; padding:6px;
+    width:100%; max-width:700px;
   }
-  .presenter-item {
-    text-align: center;
-    background: rgba(255,255,255,0.025);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 16px;
-    padding: 18px 28px;
-    backdrop-filter: blur(5px);
-    transition: all 0.3s;
-    min-width: 220px;
+  .tab-btn {
+    flex:1; padding:10px; border:none; border-radius:9px; cursor:pointer; font-family:'Cairo',sans-serif;
+    font-size:.88rem; font-weight:700; transition:all .3s; color:var(--text-muted); background:transparent;
   }
-  .presenter-item:hover {
-    border-color: rgba(0,212,255,0.3);
-    box-shadow: var(--glow);
-    transform: translateY(-2px);
-  }
-  .presenter-name {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--primary);
-    letter-spacing: -0.02em;
-  }
-  .presenter-title {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-top: 4px;
-    letter-spacing: 1px;
-  }
+  .tab-btn.active { background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; box-shadow:var(--glow); }
 
-  @media(max-width: 768px) {
-    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-    .slide { padding: 20px; }
-    .nav-btn { width: 38px; height: 38px; font-size: 14px; }
-    .presenters { gap: 16px; }
-    .presenter-item { min-width: 160px; padding: 14px 18px; }
+  .tab-pane { display:none; width:100%; max-width:980px; animation:fadeUp .4s ease; }
+  .tab-pane.active { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  .check-item {
+    display:flex; align-items:flex-start; gap:12px;
+    background:var(--bg-card); border:1px solid rgba(0,212,255,.15); border-radius:12px;
+    padding:12px 16px; cursor:pointer; transition:all .25s; user-select:none;
+  }
+  .check-item:hover { border-color:rgba(0,212,255,.35); background:rgba(255,255,255,.06); }
+  .check-item.done { border-color:rgba(16,185,129,.4); background:rgba(16,185,129,.07); }
+  .check-item.done .chk-box { background:var(--green); border-color:var(--green); }
+  .check-item.done .chk-box::after { content:'✓'; color:#fff; font-size:.75rem; }
+  .chk-box {
+    width:22px; height:22px; border-radius:6px; border:2px solid rgba(0,212,255,.4);
+    flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center;
+    transition:all .2s;
+  }
+  .check-item .chk-text h4  { font-size:.88rem; color:var(--text); margin-bottom:2px; }
+  .check-item .chk-text p   { font-size:.76rem; color:var(--text-muted); line-height:1.5; }
+
+  .progress-wrap { width:100%; max-width:980px; }
+  .progress-bar-bg { background:rgba(255,255,255,.07); border-radius:8px; height:8px; overflow:hidden; margin-top:6px; }
+  .progress-bar-fill { height:100%; border-radius:8px; background:linear-gradient(90deg,var(--primary),var(--secondary)); transition:width .5s ease; }
+  .progress-label { font-size:.78rem; color:var(--text-muted); display:flex; justify-content:space-between; }
+
+  .defense-ai-box {
+    width:100%; max-width:980px; background:linear-gradient(135deg,rgba(0,212,255,.07),rgba(123,47,247,.07));
+    border:1px solid rgba(0,212,255,.25); border-radius:14px; padding:14px 20px;
+    display:flex; gap:16px; align-items:center; flex-wrap:wrap;
+  }
+  .ai-box-icon { font-size:2rem; flex-shrink:0; }
+  .ai-box-text h3 { color:var(--primary); font-size:.92rem; margin-bottom:4px; }
+  .ai-box-text p  { color:var(--text-muted); font-size:.8rem; line-height:1.7; }
+
+  /* QUIZ */
+  .quiz-choice { background:var(--bg-card); border:1px solid rgba(0,212,255,.25); border-radius:14px; padding:14px; cursor:pointer; transition:all .2s; text-align:center; font-size:.88rem; }
+  .quiz-choice:hover { border-color:var(--primary); box-shadow:var(--glow); }
+  .quiz-choice.correct { border-color:var(--green); background:rgba(16,185,129,.1); }
+  .quiz-choice.wrong   { border-color:var(--accent); background:rgba(255,71,87,.1); }
+
+  /* RESPONSIVE */
+  @media(max-width:768px) {
+    .grid-2,.grid-3,.grid-4 { grid-template-columns:1fr; }
+    .slide { padding:20px; }
+    .nav-btn { width:38px; height:38px; font-size:14px; }
+    .tab-pane.active { grid-template-columns:1fr; }
   }
 </style>
 </head>
 <body>
 
 <button class="nav-btn nav-prev" onclick="changeSlide(-1)" title="السابق">&#8249;</button>
-<button class="nav-btn nav-next" onclick="changeSlide(1)" title="التالي">&#8250;</button>
-<div class="slide-num" id="slideNum">01 / 10</div>
-<div class="key-hint">→ للتالي &nbsp;|&nbsp; ← للسابق</div>
+<button class="nav-btn nav-next" onclick="changeSlide(1)"  title="التالي">&#8250;</button>
+<div class="slide-num" id="slideNum">01 / 14</div>
+<div class="key-hint">→ التالي &nbsp;|&nbsp; ← السابق</div>
 <div class="slide-counter" id="dots"></div>
 
-<div class="slides-container" id="slides">
+<div class="slides-container">
 
-  <!-- ══════════════════════════ SLIDE 0: COVER ══════════════════════════ -->
-  <div class="slide active" id="slide-0">
-    <div class="pulse-ring"><span style="font-size:3rem">🧠</span></div>
-    <span class="badge badge-cyan">محاضرة 2026 — تحديث مايو</span>
-    <h1 style="text-align:center; max-width:800px;">
-      الذكاء الاصطناعي<br>
-      <span class="gradient-text">والجرائم الإلكترونية الحديثة</span>
-    </h1>
+<!-- ══ 0 – COVER ═══════════════════════════════════════════════════ -->
+<div class="slide active" id="slide-0">
+  <div class="pulse-ring"><span style="font-size:2.5rem">🧠</span></div>
+  <span class="badge badge-cyan">محاضرة 2026 — تحديث مايو</span>
+  <h1 style="text-align:center;max-width:800px;">
+    الذكاء الاصطناعي<br>
+    <span class="gradient-text">والجرائم الإلكترونية الحديثة</span>
+  </h1>
+  <div class="divider"></div>
+  <h3 style="color:var(--text-muted);font-weight:400;text-align:center;font-size:.95rem;">حين يتحول الذكاء الاصطناعي من أداة للتطوير إلى سلاح رقمي</h3>
+  <div style="display:flex;gap:30px;margin-top:28px;flex-wrap:wrap;justify-content:center;">
+    <div style="text-align:center;"><div class="stat-num">95%</div><div style="color:var(--text-muted);font-size:.76rem;">من الهجمات تحتوي ذكاءً اصطناعياً</div></div>
+    <div style="width:1px;background:rgba(255,255,255,.1);"></div>
+    <div style="text-align:center;"><div class="stat-num">22 ث</div><div style="color:var(--text-muted);font-size:.76rem;">متوسط وقت الاختراق الوكيل</div></div>
+    <div style="width:1px;background:rgba(255,255,255,.1);"></div>
+    <div style="text-align:center;"><div class="stat-num">$58B</div><div style="color:var(--text-muted);font-size:.76rem;">خسائر الاحتيال المتوقعة 2030</div></div>
+  </div>
+  <div style="margin-top:32px;display:flex;justify-content:center;">
+    <div class="presenter-item">
+      <div class="presenter-name">نقيب . م / محمد إبراهيم</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 1 – AGENDA ════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-1">
+  <div class="slide-inner">
+    <span class="badge badge-purple">محاور المحاضرة</span>
+    <h2 class="gradient-text">ماذا سنتناول اليوم؟</h2>
     <div class="divider"></div>
-    <h3 style="color:var(--text-muted); font-weight:400; text-align:center;">التهديدات وأساليب المواجهة</h3>
-    <div style="display:flex; gap:30px; margin-top:36px; flex-wrap:wrap; justify-content:center;">
-      <div style="text-align:center;">
-        <div class="stat-num">95٪</div>
-        <div style="color:var(--text-muted);font-size:.85rem;">من الهجمات تحتوي على ذكاء اصطناعي</div>
+    <div class="grid-2" style="max-width:860px;">
+      <div class="card" style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:1.6rem">🤖</span><div><h3 style="color:var(--primary)">مفهوم الذكاء الاصطناعي</h3><p style="color:var(--text-muted)">كيف يعمل ولماذا أصبح سلاحاً ذا حدين</p></div></div>
+      <div class="card" style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:1.6rem">💀</span><div><h3 style="color:var(--accent)">الجرائم الإلكترونية</h3><p style="color:var(--text-muted)">تعريفها وأبرز أنواعها مع أرقام 2026</p></div></div>
+      <div class="card" style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:1.6rem">⚡</span><div><h3 style="color:#b57bff">كيف يُستغل الذكاء الاصطناعي</h3><p style="color:var(--text-muted)">التقنيات الحديثة في يد المجرمين</p></div></div>
+      <div class="card" style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:1.6rem">📋</span><div><h3 style="color:var(--primary)">سيناريوهات واقعية</h3><p style="color:var(--text-muted)">حوادث حقيقية لاختراقات بالذكاء الاصطناعي</p></div></div>
+      <div class="card card-danger" style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:1.6rem">🗺️</span><div><h3 style="color:var(--accent)">خريطة التهديدات الحية</h3><p style="color:var(--text-muted)">عرض تفاعلي لمناطق الهجمات في الوقت الفعلي</p></div></div>
+      <div class="card card-purple" style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:1.6rem">🔐</span><div><h3 style="color:#b57bff">دليل الحماية التفاعلي</h3><p style="color:var(--text-muted)">Zero Trust والدفاع بالذكاء الاصطناعي</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 2 – AI CONCEPT ════════════════════════════════════════════════ -->
+<div class="slide" id="slide-2">
+  <div class="slide-inner">
+    <span class="badge badge-cyan">القسم الأول</span>
+    <h2>مفهوم <span class="gradient-text">الذكاء الاصطناعي</span></h2>
+    <div class="divider"></div>
+    <div class="grid-2" style="max-width:920px;">
+      <div>
+        <p style="color:var(--text-muted);margin-bottom:14px;line-height:1.9;">قدرة الأنظمة على <strong style="color:var(--primary)">محاكاة التفكير البشري</strong>، اتخاذ القرارات، وتحليل البيانات بشكل مستقل وذاتي التعلم.</p>
+        <h3 style="color:var(--primary);margin-bottom:10px;">التقنيات الأساسية:</h3>
+        <ul class="styled-list">
+          <li>🧬 تعلم الآلة — Machine Learning</li>
+          <li>🧠 التعلم العميق — Deep Learning</li>
+          <li>💬 معالجة اللغة الطبيعية — NLP</li>
+          <li>👁️ الرؤية الحاسوبية — Computer Vision</li>
+          <li>🤖 الذكاء الاصطناعي التوليدي — Gen AI</li>
+        </ul>
       </div>
-      <div style="width:1px;background:rgba(255,255,255,0.1);"></div>
-      <div style="text-align:center;">
-        <div class="stat-num">22 ث</div>
-        <div style="color:var(--text-muted);font-size:.85rem;">متوسط وقت الاختراق بالذكاء الاصطناعي</div>
-      </div>
-      <div style="width:1px;background:rgba(255,255,255,0.1);"></div>
-      <div style="text-align:center;">
-        <div class="stat-num">58B$</div>
-        <div style="color:var(--text-muted);font-size:.85rem;">خسائر الاحتيال المتوقعة بـ 2030</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card" style="flex:1"><span class="icon-med">🏥</span><h3 style="color:var(--primary)">التطبيقات الإيجابية</h3><p style="color:var(--text-muted)">الطب، التعليم، المدن الذكية، المركبات ذاتية القيادة، الأمن السيبراني الدفاعي</p></div>
+        <div class="card card-danger" style="flex:1"><span class="icon-med">⚠️</span><h3 style="color:var(--accent)">الاستخدام المزدوج</h3><p style="color:var(--text-muted)">نفس التقنية يمكن توظيفها في جرائم بدقة واحترافية غير مسبوقة</p></div>
       </div>
     </div>
-    <!-- ✅ تمت إضافة أسماء المقدمين -->
-    <div class="presenters">
+  </div>
+</div>
+
+<!-- ══ 3 – CYBERCRIME ════════════════════════════════════════════════ -->
+<div class="slide" id="slide-3">
+  <div class="slide-inner">
+    <span class="badge badge-red">القسم الثاني</span>
+    <h2>الجرائم الإلكترونية — <span style="color:var(--accent)">تعريف وأنواع</span></h2>
+    <div class="divider"></div>
+    <div class="quote-box" style="margin-bottom:12px;">"الجرائم التي تُرتكب باستخدام أجهزة الحاسب أو الإنترنت أو الوسائل الرقمية بهدف الإيذاء أو الاستغلال أو السرقة"</div>
+    <div class="grid-3">
+      <div class="card card-danger" style="text-align:center"><span class="icon-big">🔓</span><h3 style="color:var(--accent)">اختراق الأنظمة</h3><p style="color:var(--text-muted);font-size:.76rem;">83% تبدأ بكلمة مرور مسروقة</p></div>
+      <div class="card card-danger" style="text-align:center"><span class="icon-big">🎭</span><h3 style="color:var(--accent)">انتحال الهوية</h3><p style="color:var(--text-muted);font-size:.76rem;">ارتفع 704% في قطاع التمويل</p></div>
+      <div class="card card-danger" style="text-align:center"><span class="icon-big">💸</span><h3 style="color:var(--accent)">الاحتيال المالي</h3><p style="color:var(--text-muted);font-size:.76rem;">$12.5B خسائر 2024</p></div>
+      <div class="card card-danger" style="text-align:center"><span class="icon-big">🗂️</span><h3 style="color:var(--accent)">سرقة البيانات</h3><p style="color:var(--text-muted);font-size:.76rem;">متوسط تكلفة الاختراق $4.88M</p></div>
+      <div class="card card-danger" style="text-align:center"><span class="icon-big">😰</span><h3 style="color:var(--accent)">الابتزاز الإلكتروني</h3><p style="color:var(--text-muted);font-size:.76rem;">تشفير + تسريب + تهديد</p></div>
+      <div class="card card-danger" style="text-align:center"><span class="icon-big">📰</span><h3 style="color:var(--accent)">التضليل الإعلامي</h3><p style="color:var(--text-muted);font-size:.76rem;">+1200 موقع مزيف بالذكاء الاصطناعي</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 4 – HOW AI EXPLOITED ══════════════════════════════════════════ -->
+<div class="slide" id="slide-4">
+  <div class="slide-inner">
+    <span class="badge badge-purple">القسم الثالث</span>
+    <h2>كيف يُستغل <span class="gradient-text">الذكاء الاصطناعي</span> في الجرائم؟</h2>
+    <div class="divider"></div>
+    <div class="timeline">
+      <div class="timeline-item"><div class="timeline-icon">🎬</div><div class="card" style="flex:1"><h3 style="color:var(--primary)">تقنية Deepfake</h3><p style="color:var(--text-muted)">توليد فيديوهات وأصوات مقنعة — ارتفعت بنسبة 3000% بين 2022 و2025</p></div></div>
+      <div class="timeline-item"><div class="timeline-icon">🎣</div><div class="card" style="flex:1"><h3 style="color:var(--primary)">AI Phishing</h3><p style="color:var(--text-muted)">رسائل مُخصصة بمعدل نجاح 89% مقابل 53% للتصيد التقليدي</p></div></div>
+      <div class="timeline-item"><div class="timeline-icon">🦠</div><div class="card" style="flex:1"><h3 style="color:var(--primary)">البرمجيات الخبيثة الذكية</h3><p style="color:var(--text-muted)">كود يعيد كتابة توقيعه كل 4 ثوانٍ ليتهرب من الحماية</p></div></div>
+      <div class="timeline-item"><div class="timeline-icon">👤</div><div class="card" style="flex:1"><h3 style="color:var(--primary)">الهويات الاصطناعية</h3><p style="color:var(--text-muted)">تجميع بيانات مسروقة لبناء شخصيات كاملة تجتاز التحقق</p></div></div>
+      <div class="timeline-item">
+        <div class="timeline-icon" style="background:linear-gradient(135deg,rgba(255,215,64,.35),rgba(255,140,0,.35));border:1px solid rgba(255,215,64,.4);">🤖</div>
+        <div class="card" style="flex:1;border-color:rgba(255,215,64,.3);">
+          <h3 style="color:var(--gold)">Agentic AI — الجديد في 2026</h3>
+          <p style="color:var(--text-muted)">وكلاء مستقلون يشنّون هجمات كاملة دون تدخل بشري في <strong style="color:var(--accent)">22 ثانية</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 5 – REAL CASES ════════════════════════════════════════════════ -->
+<div class="slide" id="slide-5">
+  <div class="slide-inner">
+    <span class="badge badge-red">من الواقع</span>
+    <h2>حوادث حقيقية <span style="color:var(--accent)">لجرائم الذكاء الاصطناعي</span></h2>
+    <div class="divider"></div>
+    <div class="grid-2" style="max-width:960px;">
+      <div class="card card-danger"><h3 style="color:var(--accent)">📞 مكالمة صوت مزيف</h3><p style="color:var(--text-muted)">محتال استنسخ صوت ضابط شرطة بالذكاء الاصطناعي وطلب تحويل أموال لـ"عملية سرية" — تم تحويل $10,000 قبل الكشف.</p></div>
+      <div class="card card-danger"><h3 style="color:var(--accent)">💸 CEO Fraud بـ Deepfake</h3><p style="color:var(--text-muted)">شركة هونغ كونغ خسرت $25 مليون بعد اجتماع Zoom مزيف بالكامل لمدير مالي وزملاء وهميين.</p></div>
+      <div class="card card-danger"><h3 style="color:var(--accent)">📧 بريد احتيالي بالذكاء الاصطناعي</h3><p style="color:var(--text-muted)">رسالة "البنك المركزي" بأسلوب رسمي خالٍ من الأخطاء لتحديث KYC — تم التصيد بنجاح لـ 400 عميل.</p></div>
+      <div class="card card-danger"><h3 style="color:var(--accent)">👔 موظف وهمي بـ Deepfake</h3><p style="color:var(--text-muted)">مرشح اجتاز 3 مقابلات فيديو بصورة رمزية وصوت مولّد — حصل على وظيفة في شركة تقنية كبرى.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 6 – STATS ══════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-6">
+  <div class="slide-inner">
+    <span class="badge badge-red">إحصاءات موثقة 2025–2026</span>
+    <h2>الحجم الحقيقي <span style="color:var(--accent)">للتهديد</span></h2>
+    <div class="divider"></div>
+    <div class="grid-4" style="margin-bottom:14px;">
+      <div class="card" style="text-align:center"><div class="stat-num">$58.3B</div><p style="color:var(--text-muted);font-size:.76rem;">خسائر الاحتيال 2030</p></div>
+      <div class="card" style="text-align:center"><div class="stat-num">$442B</div><p style="color:var(--text-muted);font-size:.76rem;">خسائر المستهلكين سنوياً</p></div>
+      <div class="card" style="text-align:center"><div class="stat-num">57%</div><p style="color:var(--text-muted);font-size:.76rem;">البالغين تعرضوا لاحتيال</p></div>
+      <div class="card" style="text-align:center"><div class="stat-num">60%</div><p style="color:var(--text-muted);font-size:.76rem;">شركات رصدت تصاعداً</p></div>
+    </div>
+    <div style="width:100%;max-width:860px;">
+      <h3 style="color:var(--primary);margin-bottom:12px;font-size:.88rem;">مستوى تطور التهديدات في 2026:</h3>
+      <div class="threat-bar"><div class="threat-label"><span>AI Phishing</span><span style="color:var(--accent)">95%</span></div><div class="bar-track"><div class="bar-fill" style="width:95%;background:linear-gradient(90deg,var(--primary),var(--secondary))"></div></div></div>
+      <div class="threat-bar"><div class="threat-label"><span>Deepfake احتيال</span><span style="color:var(--accent)">88%</span></div><div class="bar-track"><div class="bar-fill" style="width:88%;background:linear-gradient(90deg,var(--secondary),var(--accent))"></div></div></div>
+      <div class="threat-bar"><div class="threat-label"><span>فدية بالذكاء الاصطناعي</span><span style="color:var(--accent)">82%</span></div><div class="bar-track"><div class="bar-fill" style="width:82%;background:linear-gradient(90deg,var(--accent),#ff8c00)"></div></div></div>
+      <div class="threat-bar"><div class="threat-label"><span>هويات تركيبية</span><span style="color:var(--accent)">71%</span></div><div class="bar-track"><div class="bar-fill" style="width:71%;background:linear-gradient(90deg,#ff8c00,var(--primary))"></div></div></div>
+    </div>
+    <div class="warning-band"><span style="font-size:1.2rem">⚡</span><p style="font-size:.8rem;"><strong style="color:var(--accent)">Mandiant M-Trends 2026:</strong> انتقل المهاجمون إلى أدوات تكيفية ووكلاء مستقلين يعيدون كتابة كودهم في الوقت الفعلي.</p></div>
+  </div>
+</div>
+
+<!-- ══ 7 – THREATS ════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-7">
+  <div class="slide-inner">
+    <span class="badge badge-red">القسم الرابع</span>
+    <h2>أخطر التهديدات <span style="color:var(--accent)">الحالية</span></h2>
+    <div class="divider"></div>
+    <div class="grid-2" style="max-width:1000px;">
+      <div class="card card-danger"><h3 style="color:var(--accent);margin-bottom:6px;">🤖 Agentic AI Attacks</h3><p style="color:var(--text-muted)">وكلاء ذكاء اصطناعي تختاق وتستطلع وتسرق البيانات <strong style="color:white">دون تدخل بشري</strong> في 22 ثانية.</p></div>
+      <div class="card card-danger"><h3 style="color:var(--accent);margin-bottom:6px;">📞 CEO Fraud بالصوت والفيديو</h3><p style="color:var(--text-muted)">اجتماعات مرئية مزيفة تُجيز تحويلات بملايين الدولارات.</p></div>
+      <div class="card card-danger"><h3 style="color:var(--accent);margin-bottom:6px;">🏭 Ransomware-as-a-Service</h3><p style="color:var(--text-muted)">منصات اشتراك متكاملة بدعم فني وتقسيم أرباح وابتزاز متعدد الطبقات.</p></div>
+      <div class="card card-danger"><h3 style="color:var(--accent);margin-bottom:6px;">🏠 البنية التحتية الحيوية</h3><p style="color:var(--text-muted)">شبكات الكهرباء والمياه والمستشفيات — هجوم واحد يشل دولة.</p></div>
+      <div class="card card-danger"><h3 style="color:var(--accent);margin-bottom:6px;">👔 موظفون مزيفون</h3><p style="color:var(--text-muted)">مرشحون وهميون يجتازون مقابلات العمل ويصلون لأنظمة حساسة.</p></div>
+      <div class="card card-danger"><h3 style="color:var(--accent);margin-bottom:6px;">🌐 هجمات الدول القومية</h3><p style="color:var(--text-muted)">مجموعات APT مدعومة حكومياً تستخدم LLMs للتجسس والتخريب.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 8 – QUIZ ═══════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-8">
+  <div class="slide-inner">
+    <span class="badge badge-cyan">تفاعلي</span>
+    <h2>هل تستطيع <span class="gradient-text">اكتشاف المزيف؟</span></h2>
+    <div class="divider"></div>
+    <div class="grid-2" style="max-width:860px;">
+      <div>
+        <h3 style="color:var(--primary);margin-bottom:12px;">📧 أي سيناريو هو تصيد احتيالي؟</h3>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="quiz-choice" onclick="checkQ(this,'phish',true)">"عزيزي العميل، رُصد نشاط مريب على حسابك — انقر هنا للتحقق الفوري"</div>
+          <div class="quiz-choice" onclick="checkQ(this,'phish',false)">"تذكير ودي: كلمة مرورك تنتهي خلال 30 يوماً عبر بوابة البنك الرسمية"</div>
+        </div>
+        <div id="fb-phish" style="margin-top:10px;font-size:.82rem;font-weight:600;min-height:20px;"></div>
+      </div>
+      <div>
+        <h3 style="color:var(--accent);margin-bottom:12px;">📞 كيف تكشف مكالمة Deepfake؟</h3>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="quiz-choice" onclick="checkQ(this,'call',false)">تغيير طفيف في نبرة الصوت</div>
+          <div class="quiz-choice" onclick="checkQ(this,'call',false)">اللهجة مختلفة قليلاً</div>
+          <div class="quiz-choice" onclick="checkQ(this,'call',true)">إلحاح غير معتاد للتصرف الفوري دون تحقق</div>
+          <div class="quiz-choice" onclick="checkQ(this,'call',false)">جودة صوت منخفضة</div>
+        </div>
+        <div id="fb-call" style="margin-top:10px;font-size:.82rem;font-weight:600;min-height:20px;"></div>
+      </div>
+    </div>
+    <p style="color:var(--text-muted);font-size:.78rem;margin-top:14px;">انقر على خيارك — الذكاء الاصطناعي يجعل التمييز البصري شبه مستحيل، لذا ثقافتك هي سلاحك الأول.</p>
+  </div>
+</div>
+
+<!-- ══ 9 – INTERACTIVE THREAT MAP ════════════════════════════════════ -->
+<div class="slide" id="slide-9">
+  <div class="slide-inner">
+    <span class="badge badge-cyan">لوحة التهديدات — تفاعلية</span>
+    <h2>خريطة <span class="gradient-text">الهجمات الإلكترونية</span> الحية</h2>
+    <div class="divider"></div>
+
+    <!-- Live counters -->
+    <div class="live-counters">
+      <div class="counter-box"><div class="counter-val" id="cnt-phish">0</div><div class="counter-lbl">هجمة تصيد / دقيقة</div></div>
+      <div class="counter-box"><div class="counter-val" id="cnt-deep" style="color:var(--gold)">0</div><div class="counter-lbl">Deepfake محاولة / ساعة</div></div>
+      <div class="counter-box"><div class="counter-val" id="cnt-ransom" style="color:#b57bff">0</div><div class="counter-lbl">برنامج فدية نشط</div></div>
+      <div class="counter-box"><div class="counter-val" id="cnt-breach" style="color:var(--green)">0</div><div class="counter-lbl">اختراق بيانات اليوم</div></div>
+    </div>
+
+    <!-- Map -->
+    <div class="map-wrapper">
+      <div class="map-tooltip" id="mapTooltip">
+        <h4 id="tt-title"></h4><p id="tt-desc"></p>
+      </div>
+      <svg class="map-svg" viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg" id="mapSVG">
+        <!-- Ocean background -->
+        <rect width="900" height="380" fill="#070e22" rx="14"/>
+        <!-- Simplified continent shapes -->
+        <!-- North America -->
+        <path d="M80,70 L180,60 L220,80 L230,140 L200,180 L160,200 L130,190 L100,160 L70,120 Z" fill="#0d1c35" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+        <!-- South America -->
+        <path d="M160,220 L200,210 L220,250 L210,310 L190,340 L160,330 L145,290 L150,250 Z" fill="#0d1c35" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+        <!-- Europe -->
+        <path d="M380,50 L440,45 L460,70 L450,110 L410,120 L380,100 L365,75 Z" fill="#0d1c35" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+        <!-- Africa -->
+        <path d="M380,130 L440,125 L460,170 L450,260 L420,300 L390,290 L370,250 L365,180 Z" fill="#0d1c35" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+        <!-- Middle East -->
+        <path d="M460,110 L520,100 L540,130 L520,170 L470,165 L455,145 Z" fill="#0d1c35" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+        <!-- Asia -->
+        <path d="M530,40 L700,30 L760,60 L780,120 L740,160 L680,170 L620,150 L560,160 L530,130 L520,80 Z" fill="#0d1c35" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+        <!-- South Asia -->
+        <path d="M580,170 L640,165 L660,210 L630,250 L590,240 L570,200 Z" fill="#0d1c35" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+        <!-- Southeast Asia -->
+        <path d="M700,170 L760,160 L790,200 L770,240 L720,230 L695,200 Z" fill="#0d1c35" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+        <!-- Australia -->
+        <path d="M720,270 L800,265 L830,300 L810,340 L760,345 L720,320 Z" fill="#0d1c35" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+
+        <!-- Grid lines -->
+        <line x1="0" y1="190" x2="900" y2="190" stroke="rgba(0,212,255,0.06)" stroke-width="1"/>
+        <line x1="450" y1="0" x2="450" y2="380" stroke="rgba(0,212,255,0.06)" stroke-width="1"/>
+
+        <!-- Attack pulses (animated) -->
+        <g id="attackLayer"></g>
+
+        <!-- Connection lines (will be added by JS) -->
+        <g id="lineLayer"></g>
+
+        <!-- Attack nodes (clickable) -->
+        <circle class="atk-dot" data-city="نيويورك" data-type="AI Phishing" data-count="1,240 هجمة/دقيقة" data-color="#ff4757" cx="175" cy="115" r="6" fill="#ff4757" opacity=".85"/>
+        <circle class="atk-dot" data-city="لندن" data-type="Deepfake" data-count="380 محاولة/ساعة" data-color="#ffd740" cx="400" cy="72" r="6" fill="#ffd740" opacity=".85"/>
+        <circle class="atk-dot" data-city="موسكو" data-type="APT / State Actor" data-count="52 عملية نشطة" data-color="#b57bff" cx="490" cy="58" r="7" fill="#b57bff" opacity=".85"/>
+        <circle class="atk-dot" data-city="بكين" data-type="Agentic AI Attack" data-count="890 وكيل نشط" data-color="#00d4ff" cx="700" cy="95" r="7" fill="#00d4ff" opacity=".85"/>
+        <circle class="atk-dot" data-city="منطقة الشرق الأوسط" data-type="Ransomware-as-a-Service" data-count="120 مؤسسة مستهدفة" data-color="#ff8c00" cx="500" cy="135" r="6" fill="#ff8c00" opacity=".85"/>
+        <circle class="atk-dot" data-city="نيجيريا" data-type="Fraud-as-a-Service" data-count="640 حملة/يوم" data-color="#ff4757" cx="400" cy="220" r="5" fill="#ff4757" opacity=".85"/>
+        <circle class="atk-dot" data-city="سنغافورة" data-type="Supply Chain Attack" data-count="34 مؤسسة" data-color="#10B981" cx="730" cy="200" r="5" fill="#10B981" opacity=".85"/>
+        <circle class="atk-dot" data-city="برازيليا" data-type="Synthetic Identity" data-count="420 هوية مزيفة/يوم" data-color="#ffd740" cx="185" cy="270" r="5" fill="#ffd740" opacity=".85"/>
+
+        <!-- Pulse animations -->
+        <circle class="atk-pulse" cx="175" cy="115" r="6" fill="none" stroke="#ff4757" stroke-width="1.5" opacity=".5"/>
+        <circle class="atk-pulse" cx="490" cy="58" r="7" fill="none" stroke="#b57bff" stroke-width="1.5" opacity=".5" style="animation-delay:.4s"/>
+        <circle class="atk-pulse" cx="700" cy="95" r="7" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity=".5" style="animation-delay:.8s"/>
+        <circle class="atk-pulse" cx="500" cy="135" r="6" fill="none" stroke="#ff8c00" stroke-width="1.5" opacity=".5" style="animation-delay:1.2s"/>
+      </svg>
+    </div>
+
+    <div class="map-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#ff4757"></div>AI Phishing / Fraud</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ffd740"></div>Deepfake</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#00d4ff"></div>Agentic AI</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#b57bff"></div>State Actor / APT</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ff8c00"></div>Ransomware</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#10B981"></div>Supply Chain</div>
+    </div>
+    <p style="color:var(--text-muted);font-size:.75rem;">انقر على أي نقطة لمزيد من التفاصيل — الأرقام تحاكي معدلات الهجمات الفعلية</p>
+  </div>
+</div>
+
+<!-- ══ 10 – INTERACTIVE DEFENSE ══════════════════════════════════════ -->
+<div class="slide" id="slide-10">
+  <div class="slide-inner">
+    <span class="badge badge-cyan">القسم الخامس — تفاعلي</span>
+    <h2>دليل <span class="gradient-text">الحماية والمواجهة</span></h2>
+    <div class="divider"></div>
+
+    <!-- Tabs -->
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="switchTab('individuals',this)">🔐 للأفراد</button>
+      <button class="tab-btn" onclick="switchTab('orgs',this)">🏛️ للمؤسسات</button>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span style="color:var(--primary)">تقدمك في تطبيق الحماية</span>
+        <span id="progressText">0 / 0 مكتمل</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+
+    <!-- Individuals tab -->
+    <div class="tab-pane active" id="tab-individuals">
+      <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>كلمات مرور قوية + Passkeys</h4><p>استخدم مدير كلمات مرور + تفعيل المصادقة الثنائية (2FA) على كل الحسابات</p></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>تحقق قبل أي إجراء مالي</h4><p>اتصل بالشخص مباشرة على رقم تعرفه قبل أي تحويل — حتى لو كان الصوت أو الفيديو مقنعاً</p></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>لا تفتح روابط مجهولة</h4><p>تحقق من الرابط بـ VirusTotal أو URLScan.io قبل النقر</p></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>تحديث فوري للأنظمة</h4><p>90% من الاختراقات تستغل ثغرات لها تحديث متاح — لا تؤجل</p></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>لا تشارك OTP لأي جهة</h4><p>البنك وأي جهة رسمية لن تطلب منك رمز التحقق — أبداً</p></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>اشكّ في الفيديوهات المريبة</h4><p>اطلب رمزاً مرئياً عشوائياً أو لقاءً حضورياً للتحقق من الهوية</p></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>نظّف بصمتك الرقمية</h4><p>قلّل المعلومات الشخصية العامة — كل بيانة تُساعد المهاجم على بناء هويتك الاصطناعية</p></div></div>
+    </div>
+
+    <!-- Orgs tab -->
+    <div class="tab-pane" id="tab-orgs">
+      <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>معمارية Zero Trust (NIST 800-207)</h4><p>لا ثقة بأي جهاز أو مستخدم دون تحقق مستمر — حتى داخل الشبكة</p></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>UEBA — تحليل سلوكي بالذكاء الاصطناعي</h4><p>رصد الانحرافات عن السلوك الطبيعي للمستخدمين والأجهزة في الوقت الفعلي</p></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>استجابة آلية للحوادث (SOAR)</h4><p>ربط الكشف بالاستجابة الآلية — لا يمكن التصدي لهجوم 22 ثانية بشرياً</p></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>بروتوكول تحقق مشدد في التوظيف</h4><p>مقابلات حضورية أو رمز تحقق مرئي لكل مرشح عن بُعد</p></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>تدريب الموظفين دورياً</h4><p>محاكاة هجمات تصيد وDeepfake داخلية لاختبار الجاهزية</p></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>خطة استجابة للحوادث محدثة</h4><p>تدريبات Tabletop دورية + قنوات تواصل بديلة إذا سقطت الأنظمة</p></div></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>نسخ احتياطية معزولة (Air-Gapped)</h4><p>برامج الفدية الذكية تستهدف النسخ الاحتياطية المتصلة — يجب عزلها كلياً</p></div></div>
+    </div>
+
+    <!-- AI Defense box -->
+    <div class="defense-ai-box">
+      <div class="ai-box-icon">🤖</div>
+      <div class="ai-box-text">
+        <h3>الدفاع بالذكاء الاصطناعي — Agentic AI for Defense</h3>
+        <p>Google Cloud أطلقت وكلاء ذكاء اصطناعي دفاعية (Threat Hunting + Detection) · Microsoft مدّت Zero Trust للذكاء الاصطناعي · <strong style="color:var(--primary)">الترياق لهجوم الذكاء الاصطناعي هو دفاع بالذكاء الاصطناعي</strong></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 11 – NATIONAL SECURITY ════════════════════════════════════════ -->
+<div class="slide" id="slide-11">
+  <div class="slide-inner">
+    <span class="badge badge-purple">القسم السادس</span>
+    <h2>الجرائم الإلكترونية <span class="gradient-text">والأمن القومي</span></h2>
+    <div class="divider"></div>
+    <div class="grid-2" style="max-width:960px;">
+      <div class="card card-danger"><h3 style="color:var(--accent)">🏛️ البنية التحتية الحيوية</h3><p style="color:var(--text-muted)">شبكات الطاقة والمياه والاتصالات — هجوم واحد من وكيل ذكاء اصطناعي قد يشل دولة بأكملها.</p></div>
+      <div class="card card-danger"><h3 style="color:var(--accent)">🕵️ التجسس الإلكتروني</h3><p style="color:var(--text-muted)">وكلاء ذكاء اصطناعي يخترقون شبكات حكومية ويسرقون وثائق حساسة دون أي أثر بشري.</p></div>
+      <div class="card card-danger"><h3 style="color:var(--accent)">🗳️ التضليل الجماعي</h3><p style="color:var(--text-muted)">حملات Deepfake تقوّض ثقة الجمهور في الانتخابات والمؤسسات الوطنية.</p></div>
+      <div class="card card-danger"><h3 style="color:var(--accent)">📜 تصنيف NCSC / CISA 2026</h3><p style="color:var(--text-muted)">Agentic AI مُصنَّف تهديداً من المستوى الأول للأمن الوطني في أحدث التقارير.</p></div>
+    </div>
+    <div class="quote-box" style="max-width:860px;">"في العصر الرقمي، أمن الدولة يبدأ من وعي كل فرد — الجريمة الإلكترونية لم تعد مجرد جريمة مالية، بل تحدٍّ وجودي."</div>
+  </div>
+</div>
+
+<!-- ══ 12 – INSTITUTIONS ══════════════════════════════════════════════ -->
+<div class="slide" id="slide-12">
+  <div class="slide-inner">
+    <span class="badge badge-purple">القسم السابع</span>
+    <h2>دور <span class="gradient-text">المؤسسات والمجتمع</span></h2>
+    <div class="divider"></div>
+    <div class="grid-3" style="max-width:1000px;">
+      <div class="card" style="text-align:center"><span class="icon-big">🎓</span><h3 style="color:var(--primary)">التعليم والتوعية</h3><p style="color:var(--text-muted);font-size:.78rem;">دمج الأمن السيبراني في المناهج الدراسية</p></div>
+      <div class="card" style="text-align:center"><span class="icon-big">⚖️</span><h3 style="color:var(--primary)">التشريع والقانون</h3><p style="color:var(--text-muted);font-size:.78rem;">EU AI Act — أول تشريع شامل للذكاء الاصطناعي</p></div>
+      <div class="card" style="text-align:center"><span class="icon-big">🤝</span><h3 style="color:var(--primary)">التعاون الدولي</h3><p style="color:var(--text-muted);font-size:.78rem;">إنتربول ينسق 195 دولة ضد الجرائم الإلكترونية</p></div>
+      <div class="card" style="text-align:center"><span class="icon-big">🔬</span><h3 style="color:var(--primary)">البحث والتطوير</h3><p style="color:var(--text-muted);font-size:.78rem;">كاشف Deepfake بدقة 96% — سباق تسليح رقمي</p></div>
+      <div class="card" style="text-align:center"><span class="icon-big">👮</span><h3 style="color:var(--primary)">الأجهزة الأمنية</h3><p style="color:var(--text-muted);font-size:.78rem;">وحدات متخصصة وقدرات جنائية رقمية</p></div>
+      <div class="card" style="text-align:center"><span class="icon-big">🧑‍💻</span><h3 style="color:var(--primary)">الكوادر المتخصصة</h3><p style="color:var(--text-muted);font-size:.78rem;">فجوة 4 ملايين وظيفة سيبرانية بحاجة للسد</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 13 – CONCLUSION ════════════════════════════════════════════════ -->
+<div class="slide" id="slide-13">
+  <div class="slide-inner" style="text-align:center;align-items:center;">
+    <span class="badge badge-cyan">الخاتمة</span>
+    <h2 style="max-width:700px;text-align:center;">الذكاء الاصطناعي <span class="gradient-text">سلاح ذو حدين</span></h2>
+    <div class="divider"></div>
+    <div class="grid-2" style="max-width:860px;margin-bottom:14px;">
+      <div class="card" style="border-color:rgba(0,212,255,.4);text-align:center"><span style="font-size:2.5rem">🌟</span><h3 style="color:var(--primary);margin:8px 0;">الجانب المضيء</h3><p style="color:var(--text-muted)">تطور علمي وطبي وأمني غير مسبوق.</p></div>
+      <div class="card card-danger" style="text-align:center"><span style="font-size:2.5rem">☠️</span><h3 style="color:var(--accent);margin:8px 0;">الجانب المظلم</h3><p style="color:var(--text-muted)">جرائم أكثر تعقيداً وأسرع تنفيذاً.</p></div>
+    </div>
+    <div class="quote-box" style="text-align:center;border-right:none;border-bottom:4px solid var(--primary);border-radius:12px 12px 0 0;">"الوعي الرقمي والأمن السيبراني لم يعودا ترفاً — بل ضرورة وجودية لحماية الأفراد والمؤسسات والدول"</div>
+    <div style="display:flex;gap:14px;margin-top:16px;flex-wrap:wrap;justify-content:center;">
+      <div class="card" style="padding:12px 20px;text-align:center;min-width:130px;"><div style="font-size:1.2rem">🛡️</div><p style="font-size:.78rem;color:var(--primary);margin-top:4px;">ابقَ متيقظاً</p></div>
+      <div class="card" style="padding:12px 20px;text-align:center;min-width:130px;"><div style="font-size:1.2rem">📚</div><p style="font-size:.78rem;color:var(--primary);margin-top:4px;">ابقَ متعلماً</p></div>
+      <div class="card" style="padding:12px 20px;text-align:center;min-width:130px;"><div style="font-size:1.2rem">🤝</div><p style="font-size:.78rem;color:var(--primary);margin-top:4px;">ابقَ متعاوناً</p></div>
+      <div class="card" style="padding:12px 20px;text-align:center;min-width:130px;"><div style="font-size:1.2rem">🔐</div><p style="font-size:.78rem;color:var(--primary);margin-top:4px;">ابقَ محمياً</p></div>
+    </div>
+    <div style="margin-top:24px;display:flex;justify-content:center;">
       <div class="presenter-item">
         <div class="presenter-name">نقيب . م / محمد إبراهيم</div>
       </div>
     </div>
+    <p style="color:var(--text-muted);margin-top:14px;font-size:.88rem;">شكراً لحسن استماعكم — الأسئلة والنقاش مرحب بها 🙌</p>
   </div>
-
-  <!-- ══════════════════════════ SLIDE 1: AGENDA ══════════════════════════ -->
-  <div class="slide" id="slide-1">
-    <div class="slide-inner">
-      <span class="badge badge-purple">محاور المحاضرة</span>
-      <h2 class="gradient-text">ماذا سنتناول اليوم؟</h2>
-      <div class="divider"></div>
-      <div class="grid-2" style="max-width:860px;">
-        <div class="card" style="display:flex;gap:14px;align-items:flex-start;">
-          <span style="font-size:1.8rem">🤖</span>
-          <div><h3 style="color:var(--primary)">مفهوم الذكاء الاصطناعي</h3><p style="color:var(--text-muted);font-size:.9rem">كيف يعمل ولماذا أصبح سلاحاً ذا حدين</p></div>
-        </div>
-        <div class="card" style="display:flex;gap:14px;align-items:flex-start;">
-          <span style="font-size:1.8rem">💀</span>
-          <div><h3 style="color:var(--accent)">الجرائم الإلكترونية</h3><p style="color:var(--text-muted);font-size:.9rem">تعريفها وأبرز أنواعها</p></div>
-        </div>
-        <div class="card" style="display:flex;gap:14px;align-items:flex-start;">
-          <span style="font-size:1.8rem">⚡</span>
-          <div><h3 style="color:#b57bff">كيف يُستغل الذكاء الاصطناعي</h3><p style="color:var(--text-muted);font-size:.9rem">التقنيات الحديثة في يد المجرمين</p></div>
-        </div>
-        <div class="card" style="display:flex;gap:14px;align-items:flex-start;">
-          <span style="font-size:1.8rem">📊</span>
-          <div><h3 style="color:var(--primary)">أرقام 2026</h3><p style="color:var(--text-muted);font-size:.9rem">أحدث الإحصاءات والتقارير العالمية</p></div>
-        </div>
-        <div class="card card-danger" style="display:flex;gap:14px;align-items:flex-start;">
-          <span style="font-size:1.8rem">🛡️</span>
-          <div><h3 style="color:var(--accent)">أخطر التهديدات الحالية</h3><p style="color:var(--text-muted);font-size:.9rem">Agentic AI ودور الدول والمؤسسات</p></div>
-        </div>
-        <div class="card card-purple" style="display:flex;gap:14px;align-items:flex-start;">
-          <span style="font-size:1.8rem">🔐</span>
-          <div><h3 style="color:#b57bff">أساليب الحماية والمواجهة</h3><p style="color:var(--text-muted);font-size:.9rem">Zero Trust والدفاع بالذكاء الاصطناعي</p></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- الشرائح من 2 إلى 8 كما هي بدون تغيير -->
-  <!-- SLIDE 2: AI CONCEPT -->
-  <div class="slide" id="slide-2">
-    <div class="slide-inner">
-      <span class="badge badge-cyan">القسم الأول</span>
-      <h2>مفهوم <span class="gradient-text">الذكاء الاصطناعي</span></h2>
-      <div class="divider"></div>
-      <div class="grid-2" style="max-width:920px;">
-        <div>
-          <p style="color:var(--text-muted);margin-bottom:20px;line-height:2;">قدرة الأنظمة على <strong style="color:var(--primary)">محاكاة التفكير البشري</strong>، اتخاذ القرارات، وتحليل البيانات بشكل مستقل وذاتي التعلم.</p>
-          <h3 style="color:var(--primary);margin-bottom:12px;">التقنيات الأساسية:</h3>
-          <ul class="styled-list">
-            <li>🧬 تعلم الآلة <em style="color:var(--text-muted)">(Machine Learning)</em></li>
-            <li>🧠 التعلم العميق <em style="color:var(--text-muted)">(Deep Learning)</em></li>
-            <li>💬 معالجة اللغة الطبيعية <em style="color:var(--text-muted)">(NLP)</em></li>
-            <li>👁️ الرؤية الحاسوبية <em style="color:var(--text-muted)">(Computer Vision)</em></li>
-            <li>🤖 الذكاء الاصطناعي التوليدي <em style="color:var(--text-muted)">(Gen AI)</em></li>
-          </ul>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:14px;">
-          <div class="card" style="flex:1">
-            <span class="icon-med">🏥</span>
-            <h3 style="color:var(--primary)">التطبيقات الإيجابية</h3>
-            <p style="color:var(--text-muted);font-size:.9rem">الطب، التعليم، المنشآت الذكية، المركبات ذاتية القيادة، الأمن السيبراني الدفاعي</p>
-          </div>
-          <div class="card card-danger" style="flex:1">
-            <span class="icon-med">⚠️</span>
-            <h3 style="color:var(--accent)">مخاطر الاستخدام السيئ</h3>
-            <p style="color:var(--text-muted);font-size:.9rem">نفس التقنية يمكن توظيفها لتنفيذ جرائم بدقة واحترافية غير مسبوقة</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SLIDE 3: CYBERCRIME -->
-  <div class="slide" id="slide-3">
-    <div class="slide-inner">
-      <span class="badge badge-red">القسم الثاني</span>
-      <h2>الجرائم الإلكترونية — <span style="color:var(--accent)">تعريف وأنواع</span></h2>
-      <div class="divider"></div>
-      <div class="quote-box">
-        "الجرائم التي تُرتكب باستخدام أجهزة الحاسب أو الإنترنت أو الوسائل الرقمية بهدف الإيذاء أو الاستغلال أو السرقة"
-      </div>
-      <div class="grid-3" style="margin-top:10px;">
-        <div class="card card-danger" style="text-align:center">
-          <span class="icon-big">🔓</span>
-          <h3 style="color:var(--accent)">اختراق الأنظمة</h3>
-          <p style="color:var(--text-muted);font-size:.85rem">الوصول غير المصرح إلى حسابات وشبكات المؤسسات</p>
-        </div>
-        <div class="card card-danger" style="text-align:center">
-          <span class="icon-big">🎭</span>
-          <h3 style="color:var(--accent)">انتحال الهوية</h3>
-          <p style="color:var(--text-muted);font-size:.85rem">Deepfake • استنساخ الصوت • بطاقات هوية مزيفة</p>
-        </div>
-        <div class="card card-danger" style="text-align:center">
-          <span class="icon-big">💸</span>
-          <h3 style="color:var(--accent)">الاحتيال المالي</h3>
-          <p style="color:var(--text-muted);font-size:.85rem">خسائر بلغت 12.5 مليار دولار (2024)</p>
-        </div>
-        <div class="card card-danger" style="text-align:center">
-          <span class="icon-big">🗂️</span>
-          <h3 style="color:var(--accent)">سرقة البيانات</h3>
-          <p style="color:var(--text-muted);font-size:.85rem">بيانات شخصية وطبية وتجارية حساسة</p>
-        </div>
-        <div class="card card-danger" style="text-align:center">
-          <span class="icon-big">😰</span>
-          <h3 style="color:var(--accent)">الابتزاز الإلكتروني</h3>
-          <p style="color:var(--text-muted);font-size:.85rem">تهديد بنشر محتوى أو تعطيل خدمات</p>
-        </div>
-        <div class="card card-danger" style="text-align:center">
-          <span class="icon-big">📰</span>
-          <h3 style="color:var(--accent)">الأخبار المزيفة</h3>
-          <p style="color:var(--text-muted);font-size:.85rem">توليد محتوى مضلل واسع النطاق بالذكاء الاصطناعي</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SLIDE 4: HOW AI IS EXPLOITED -->
-  <div class="slide" id="slide-4">
-    <div class="slide-inner">
-      <span class="badge badge-purple">القسم الثالث</span>
-      <h2>كيف يُستغل <span class="gradient-text">الذكاء الاصطناعي</span> في الجرائم؟</h2>
-      <div class="divider"></div>
-      <div class="timeline">
-        <div class="timeline-item">
-          <div class="timeline-icon">🎬</div>
-          <div class="timeline-content card">
-            <h3 style="color:var(--primary)">تقنية Deepfake</h3>
-            <p style="color:var(--text-muted)">توليد فيديوهات وأصوات مقنعة لمسؤولين وأشخاص حقيقيين — تُستخدم في عمليات احتيال مالي واجتماعات مزيفة عبر الفيديو</p>
-          </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-icon">🎣</div>
-          <div class="timeline-content card">
-            <h3 style="color:var(--primary)">التصيد الاحتيالي بالذكاء الاصطناعي (AI Phishing)</h3>
-            <p style="color:var(--text-muted)">رسائل شخصية محكمة الصياغة خالية من الأخطاء اللغوية — صعبة الكشف حتى للمتخصصين</p>
-          </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-icon">🦠</div>
-          <div class="timeline-content card">
-            <h3 style="color:var(--primary)">البرمجيات الخبيثة الذكية (AI Malware)</h3>
-            <p style="color:var(--text-muted)">كود يعيد كتابة نفسه في الوقت الفعلي ليتهرب من برامج الحماية — اكتشاف ثغرات في ساعات لا أسابيع</p>
-          </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-icon">👤</div>
-          <div class="timeline-content card">
-            <h3 style="color:var(--primary)">الهويات الاصطناعية (Synthetic Identity)</h3>
-            <p style="color:var(--text-muted)">تجميع بيانات مسروقة لبناء شخصيات كاملة تجتاز أنظمة التحقق — تُستخدم في التوظيف والخدمات المالية</p>
-          </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-icon">🤖</div>
-          <div class="timeline-content card">
-            <h3 style="color:#ffcc00">الذكاء الاصطناعي الوكيل (Agentic AI) — جديد 2026</h3>
-            <p style="color:var(--text-muted)">وكلاء ذكاء اصطناعي مستقلون يشنّون هجمات كاملة دون تدخل بشري — يتحرك الاختراق في <strong style="color:var(--accent)">22 ثانية فقط</strong></p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SLIDE 5: STATS 2026 -->
-  <div class="slide" id="slide-5">
-    <div class="slide-inner">
-      <span class="badge badge-red">أرقام وإحصاءات 2026</span>
-      <h2>الحجم الحقيقي <span style="color:var(--accent)">للتهديد</span></h2>
-      <div class="divider"></div>
-      <div class="grid-4" style="margin-bottom:16px;">
-        <div class="card" style="text-align:center">
-          <div class="stat-num">$58.3B</div>
-          <p style="color:var(--text-muted);font-size:.85rem">خسائر الاحتيال المتوقعة بحلول 2030</p>
-        </div>
-        <div class="card" style="text-align:center">
-          <div class="stat-num">$442B</div>
-          <p style="color:var(--text-muted);font-size:.85rem">خسائر المستهلكين المباشرة سنوياً</p>
-        </div>
-        <div class="card" style="text-align:center">
-          <div class="stat-num">57٪</div>
-          <p style="color:var(--text-muted);font-size:.85rem">من البالغين تعرضوا لعملية احتيال</p>
-        </div>
-        <div class="card" style="text-align:center">
-          <div class="stat-num">60٪</div>
-          <p style="color:var(--text-muted);font-size:.85rem">من الشركات رصدت زيادة في خسائر الاحتيال</p>
-        </div>
-      </div>
-      <div style="width:100%;max-width:860px;">
-        <h3 style="color:var(--primary);margin-bottom:16px;">مستوى تطور التهديدات:</h3>
-        <div class="threat-bar"><div class="threat-label"><span>هجمات التصيد بالذكاء الاصطناعي</span><span style="color:var(--accent)">95٪</span></div><div class="bar-track"><div class="bar-fill" style="width:95%;background:linear-gradient(90deg,var(--primary),var(--secondary))"></div></div></div>
-        <div class="threat-bar"><div class="threat-label"><span>تقنيات Deepfake في الاحتيال</span><span style="color:var(--accent)">88٪</span></div><div class="bar-track"><div class="bar-fill" style="width:88%;background:linear-gradient(90deg,var(--secondary),var(--accent))"></div></div></div>
-        <div class="threat-bar"><div class="threat-label"><span>برامج الفدية المدعومة بالذكاء الاصطناعي</span><span style="color:var(--accent)">82٪</span></div><div class="bar-track"><div class="bar-fill" style="width:82%;background:linear-gradient(90deg,var(--accent),#ff8c00)"></div></div></div>
-        <div class="threat-bar"><div class="threat-label"><span>الهويات الاصطناعية في التوظيف</span><span style="color:var(--accent)">71٪</span></div><div class="bar-track"><div class="bar-fill" style="width:71%;background:linear-gradient(90deg,#ff8c00,var(--primary))"></div></div></div>
-      </div>
-      <div class="warning-band">
-        <span style="font-size:1.5rem">⚡</span>
-        <p style="font-size:.9rem">تقرير Mandiant M-Trends 2026: انتقل المهاجمون من التجريب إلى نشر أدوات تكيفية ووكلاء مستقلين قادرة على إعادة كتابة كودها في الوقت الفعلي</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- SLIDE 6: THREATS -->
-  <div class="slide" id="slide-6">
-    <div class="slide-inner">
-      <span class="badge badge-red">القسم الرابع</span>
-      <h2>أخطر التهديدات <span style="color:var(--accent)">الحالية</span></h2>
-      <div class="divider"></div>
-      <div class="grid-2" style="max-width:1000px;">
-        <div class="card card-danger"><h3 style="color:var(--accent);margin-bottom:10px;">🤖 Agentic AI Attacks</h3><p style="color:var(--text-muted);">وكلاء ذكاء اصطناعي تستطيع الاستطلاع والاختراق وسرقة البيانات وتصعيد الصلاحيات <strong style="color:white">بالكامل دون تدخل بشري</strong> في أقل من 22 ثانية</p></div>
-        <div class="card card-danger"><h3 style="color:var(--accent);margin-bottom:10px;">📞 CEO Fraud بالصوت والفيديو</h3><p style="color:var(--text-muted);">مكالمات واجتماعات مرئية مزيفة باستخدام Deepfake لمسؤولين تنفيذيين تُجيز تحويلات مالية ضخمة — أصبحت روتينية في 2026</p></div>
-        <div class="card card-danger"><h3 style="color:var(--accent);margin-bottom:10px;">🏭 Ransomware-as-a-Service</h3><p style="color:var(--text-muted);">منصات متكاملة تقدم برامج فدية كخدمة اشتراك مع دعم فني وتقسيم أرباح — ابتزاز متعدد الطبقات: تشفير + تسريب + تهديد علني</p></div>
-        <div class="card card-danger"><h3 style="color:var(--accent);margin-bottom:10px;">🏠 البنية التحتية الحيوية</h3><p style="color:var(--text-muted);">شبكات الكهرباء والمياه والمستشفيات والمنازل الذكية — نقاط دخول جديدة لم تكن مأخوذة في الاعتبار سابقاً</p></div>
-        <div class="card card-danger"><h3 style="color:var(--accent);margin-bottom:10px;">👔 موظفون مزيفون (Deepfake Hiring)</h3><p style="color:var(--text-muted);">مرشحون وهميون يجتازون المقابلات الشخصية بالذكاء الاصطناعي ويصلون إلى أنظمة حساسة — تحذير Experian 2026</p></div>
-        <div class="card card-danger"><h3 style="color:var(--accent);margin-bottom:10px;">🌐 هجمات الدول القومية</h3><p style="color:var(--text-muted);">مجموعات مدعومة حكومياً تستخدم الذكاء الاصطناعي في عمليات تجسس وتخريب — تُصنَّف كتهديد أمن قومي عالمي</p></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SLIDE 7: DEFENSE -->
-  <div class="slide" id="slide-7">
-    <div class="slide-inner">
-      <span class="badge badge-cyan">القسم الخامس</span>
-      <h2>أساليب <span class="gradient-text">المواجهة والحماية</span></h2>
-      <div class="divider"></div>
-      <div class="grid-2" style="max-width:1000px;">
-        <div>
-          <h3 style="color:var(--primary);margin-bottom:14px;">🔐 للأفراد</h3>
-          <ul class="styled-list">
-            <li>كلمات مرور قوية + مصادقة ثنائية</li>
-            <li>التحقق من هوية المتصلين قبل أي إجراء</li>
-            <li>عدم فتح روابط أو ملفات مجهولة</li>
-            <li>تحديث الأنظمة والتطبيقات فوراً</li>
-            <li>التشكيك في أي فيديو أو صوت مثير للريبة</li>
-          </ul>
-        </div>
-        <div>
-          <h3 style="color:#b57bff;margin-bottom:14px;">🏛️ للمؤسسات</h3>
-          <ul class="styled-list">
-            <li>معمارية <strong style="color:var(--primary)">Zero Trust</strong> — لا ثقة بدون تحقق</li>
-            <li>أنظمة كشف تعتمد على الذكاء الاصطناعي</li>
-            <li>مراقبة سلوكية مستمرة في الوقت الفعلي</li>
-            <li>تدريب الموظفين على التهديدات الحديثة</li>
-            <li>بروتوكولات تحقق صارمة في التوظيف عن بُعد</li>
-          </ul>
-        </div>
-      </div>
-      <div class="card" style="max-width:860px;margin-top:10px;background:linear-gradient(135deg,rgba(0,212,255,0.08),rgba(123,47,247,0.08))">
-        <h3 style="color:var(--primary);margin-bottom:12px;">🤖 الدفاع بالذكاء الاصطناعي — Agentic AI for Defense</h3>
-        <p style="color:var(--text-muted);">
-          Google Cloud أطلقت عام 2026 وكلاء ذكاء اصطناعي دفاعية (Threat Hunting + Detection Engineering) —
-          Microsoft مدّت معمارية Zero Trust لتشمل دورة حياة الذكاء الاصطناعي الكاملة —
-          المبدأ: <strong style="color:var(--primary)">الترياق لهجوم الذكاء الاصطناعي هو دفاع يعتمد على الذكاء الاصطناعي</strong>
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <!-- SLIDE 8: INSTITUTIONS -->
-  <div class="slide" id="slide-8">
-    <div class="slide-inner">
-      <span class="badge badge-purple">القسم السادس</span>
-      <h2>دور <span class="gradient-text">المؤسسات والمجتمع</span></h2>
-      <div class="divider"></div>
-      <div class="grid-3" style="max-width:1000px;">
-        <div class="card" style="text-align:center"><span class="icon-big">🎓</span><h3 style="color:var(--primary)">التعليم والتوعية</h3><p style="color:var(--text-muted);font-size:.9rem">دمج الأمن السيبراني في مناهج التعليم — ورش توعية منتظمة للأسر والموظفين</p></div>
-        <div class="card" style="text-align:center"><span class="icon-big">⚖️</span><h3 style="color:var(--primary)">التشريع والقانون</h3><p style="color:var(--text-muted);font-size:.9rem">قوانين محدّثة تواكب الجرائم المستحدثة — تنظيم استخدام الذكاء الاصطناعي التوليدي</p></div>
-        <div class="card" style="text-align:center"><span class="icon-big">🤝</span><h3 style="color:var(--primary)">التعاون الدولي</h3><p style="color:var(--text-muted);font-size:.9rem">الجرائم الإلكترونية لا تعرف حدوداً — تبادل المعلومات الاستخباراتية بين الدول</p></div>
-        <div class="card" style="text-align:center"><span class="icon-big">🔬</span><h3 style="color:var(--primary)">البحث والتطوير</h3><p style="color:var(--text-muted);font-size:.9rem">تطوير تقنيات كشف Deepfake — أدوات مقاومة البرمجيات الخبيثة الذكية</p></div>
-        <div class="card" style="text-align:center"><span class="icon-big">👮</span><h3 style="color:var(--primary)">الأجهزة الأمنية</h3><p style="color:var(--text-muted);font-size:.9rem">وحدات متخصصة في الجرائم السيبرانية — قدرات محاكمة جنائية رقمية</p></div>
-        <div class="card" style="text-align:center"><span class="icon-big">🧑‍💻</span><h3 style="color:var(--primary)">الكوادر المتخصصة</h3><p style="color:var(--text-muted);font-size:.9rem">تأهيل متخصصين في الأمن السيبراني — فجوة 4 ملايين وظيفة عالمياً بحاجة للسد</p></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════ SLIDE 9: CONCLUSION (بدون تحميل) ══════════════════════════ -->
-  <div class="slide" id="slide-9">
-    <div class="slide-inner" style="text-align:center;align-items:center;">
-      <span class="badge badge-cyan">الخاتمة</span>
-      <h2 style="max-width:700px;text-align:center;">
-        الذكاء الاصطناعي
-        <span class="gradient-text"> سلاح ذو حدين</span>
-      </h2>
-      <div class="divider"></div>
-      <div class="grid-2" style="max-width:860px;margin-bottom:20px;">
-        <div class="card" style="border-color:rgba(0,212,255,0.4);text-align:center">
-          <span style="font-size:3rem">🌟</span>
-          <h3 style="color:var(--primary);margin:10px 0;">الجانب المضيء</h3>
-          <p style="color:var(--text-muted);">تطور علمي وطبي وتعليمي وأمني غير مسبوق — أدوات دفاعية أقوى من أي وقت مضى</p>
-        </div>
-        <div class="card card-danger" style="text-align:center">
-          <span style="font-size:3rem">☠️</span>
-          <h3 style="color:var(--accent);margin:10px 0;">الجانب المظلم</h3>
-          <p style="color:var(--text-muted);">جرائم أكثر تعقيداً وأصعب كشفاً وأسرع تنفيذاً — وكلاء مستقلون لا يحتاجون بشراً</p>
-        </div>
-      </div>
-      <div class="quote-box" style="text-align:center;border-right:none;border-bottom:4px solid var(--primary);border-radius:12px 12px 0 0;">
-        "الوعي الرقمي والأمن السيبراني لم يعودا ترفاً — بل ضرورة وجودية لحماية الأفراد والمؤسسات والدول"
-      </div>
-      <div style="display:flex;gap:20px;margin-top:20px;flex-wrap:wrap;justify-content:center;">
-        <div class="card" style="padding:14px 24px;text-align:center;min-width:160px;">
-          <div style="font-size:1.4rem">🛡️</div>
-          <p style="font-size:.85rem;color:var(--primary);margin-top:6px;">ابقَ متيقظاً</p>
-        </div>
-        <div class="card" style="padding:14px 24px;text-align:center;min-width:160px;">
-          <div style="font-size:1.4rem">📚</div>
-          <p style="font-size:.85rem;color:var(--primary);margin-top:6px;">ابقَ متعلماً</p>
-        </div>
-        <div class="card" style="padding:14px 24px;text-align:center;min-width:160px;">
-          <div style="font-size:1.4rem">🤝</div>
-          <p style="font-size:.85rem;color:var(--primary);margin-top:6px;">ابقَ متعاوناً</p>
-        </div>
-        <div class="card" style="padding:14px 24px;text-align:center;min-width:160px;">
-          <div style="font-size:1.4rem">🔐</div>
-          <p style="font-size:.85rem;color:var(--primary);margin-top:6px;">ابقَ محمياً</p>
-        </div>
-      </div>
-      <!-- ✅ تمت إزالة زر التحميل واستبداله بذكر المقدمين مرة أخرى -->
-      <div class="presenters" style="margin-top:24px;">
-        <div class="presenter-item">
-          <div class="presenter-name">نقيب . م / محمد إبراهيم</div>
-        </div>
-      </div>
-      <p style="color:var(--text-muted);margin-top:16px;font-size:.9rem;">شكراً لحسن استماعكم — الأسئلة والنقاش مرحب بها 🙌</p>
-    </div>
-  </div>
-
 </div>
 
+</div><!-- end slides-container -->
+
 <script>
-  const TOTAL = 10;
-  let current = 0;
+/* ── SLIDE ENGINE ─────────────────────────── */
+const TOTAL = 14;
+let current = 0;
 
-  const dotsEl = document.getElementById('dots');
-  for (let i = 0; i < TOTAL; i++) {
-    const d = document.createElement('div');
-    d.className = 'dot' + (i === 0 ? ' active' : '');
-    d.onclick = () => goTo(i);
-    dotsEl.appendChild(d);
+const dotsEl = document.getElementById('dots');
+for (let i = 0; i < TOTAL; i++) {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  d.onclick = () => goTo(i);
+  dotsEl.appendChild(d);
+}
+
+function goTo(n) {
+  const slides = document.querySelectorAll('.slide');
+  slides[current].classList.remove('active');
+  slides[current].classList.add('exit');
+  setTimeout(() => slides[current].classList.remove('exit'), 600);
+  current = ((n % TOTAL) + TOTAL) % TOTAL;
+  slides[current].classList.add('active');
+  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i === current));
+  document.getElementById('slideNum').textContent =
+    String(current+1).padStart(2,'0') + ' / ' + String(TOTAL).padStart(2,'0');
+  if (current === 9) startCounters();
+}
+
+function changeSlide(dir) { goTo(current + dir); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft')  changeSlide(1);
+  if (e.key === 'ArrowRight') changeSlide(-1);
+});
+let startX = 0;
+document.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+document.addEventListener('touchend',   e => {
+  const dx = e.changedTouches[0].clientX - startX;
+  if (Math.abs(dx) > 50) changeSlide(dx > 0 ? -1 : 1);
+});
+
+/* ── QUIZ ─────────────────────────────────── */
+const quizGroups = {};
+function checkQ(el, group, correct) {
+  if (quizGroups[group]) return;
+  quizGroups[group] = true;
+  el.classList.add(correct ? 'correct' : 'wrong');
+  const fb = document.getElementById('fb-' + group);
+  if (correct) {
+    fb.textContent = '✅ إجابة صحيحة! خبرتك الأمنية في المسار الصحيح.';
+    fb.style.color = 'var(--green)';
+  } else {
+    fb.textContent = '❌ ليست الإجابة المثلى — راجع التعريف في الشريحة السابقة.';
+    fb.style.color = 'var(--accent)';
   }
+}
 
-  function goTo(n) {
-    const slides = document.querySelectorAll('.slide');
-    slides[current].classList.remove('active');
-    slides[current].classList.add('exit');
-    setTimeout(() => slides[current].classList.remove('exit'), 600);
-    current = (n + TOTAL) % TOTAL;
-    slides[current].classList.add('active');
-    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
-    document.getElementById('slideNum').textContent = String(current + 1).padStart(2, '0') + ' / ' + String(TOTAL).padStart(2, '0');
-  }
-
-  function changeSlide(dir) { goTo(current + dir); }
-
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft') changeSlide(1);
-    if (e.key === 'ArrowRight') changeSlide(-1);
+/* ── MAP TOOLTIP ───────────────────────────── */
+const tooltip = document.getElementById('mapTooltip');
+document.querySelectorAll('.atk-dot').forEach(dot => {
+  dot.addEventListener('mouseenter', e => {
+    const svg = document.getElementById('mapSVG');
+    const rect = svg.getBoundingClientRect();
+    const wrapper = document.querySelector('.map-wrapper');
+    const wRect = wrapper.getBoundingClientRect();
+    const cx = parseFloat(dot.getAttribute('cx'));
+    const cy = parseFloat(dot.getAttribute('cy'));
+    const scaleX = rect.width / 900;
+    const scaleY = rect.height / 380;
+    const px = cx * scaleX + (rect.left - wRect.left);
+    const py = cy * scaleY + (rect.top  - wRect.top);
+    document.getElementById('tt-title').textContent = dot.dataset.city;
+    document.getElementById('tt-desc').innerHTML =
+      `<span style="color:${dot.dataset.color}">${dot.dataset.type}</span><br>${dot.dataset.count}`;
+    tooltip.style.left = (px + 12) + 'px';
+    tooltip.style.top  = (py - 10) + 'px';
+    tooltip.classList.add('show');
   });
+  dot.addEventListener('mouseleave', () => tooltip.classList.remove('show'));
+});
 
-  let startX = 0;
-  document.addEventListener('touchstart', e => startX = e.touches[0].clientX);
-  document.addEventListener('touchend', e => {
-    const dx = e.changedTouches[0].clientX - startX;
-    if (Math.abs(dx) > 50) changeSlide(dx > 0 ? -1 : 1);
-  });
+/* ── ANIMATED FLYING PACKETS ─────────────────── */
+function addPacket(x1,y1,x2,y2,color) {
+  const svg = document.getElementById('mapSVG');
+  const lineLayer = document.getElementById('lineLayer');
+  // faint beam
+  const beam = document.createElementNS('http://www.w3.org/2000/svg','line');
+  beam.setAttribute('x1',x1); beam.setAttribute('y1',y1);
+  beam.setAttribute('x2',x2); beam.setAttribute('y2',y2);
+  beam.setAttribute('stroke',color); beam.setAttribute('stroke-width','0.5');
+  beam.setAttribute('opacity','0.18'); beam.setAttribute('stroke-dasharray','4 8');
+  lineLayer.appendChild(beam);
+  // travelling dot
+  const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  circle.setAttribute('r','3'); circle.setAttribute('fill',color);
+  const anim = document.createElementNS('http://www.w3.org/2000/svg','animateMotion');
+  anim.setAttribute('dur', (1.5 + Math.random()*1.5)+'s');
+  anim.setAttribute('repeatCount','indefinite');
+  anim.setAttribute('path',`M${x1},${y1} L${x2},${y2}`);
+  circle.appendChild(anim);
+  lineLayer.appendChild(circle);
+}
+
+// Attack routes (src -> target, color)
+const routes = [
+  [490,58, 400,72, '#b57bff'],  // Moscow → London
+  [700,95, 175,115,'#00d4ff'],  // Beijing → New York
+  [400,220,400,72, '#ff4757'],  // Nigeria → London
+  [500,135,400,72, '#ff8c00'],  // Middle East → London
+  [700,95, 500,135,'#00d4ff'],  // Beijing → Middle East
+  [185,270,175,115,'#ffd740'],  // Brazil → New York
+  [730,200,700,95, '#10B981'],  // Singapore → Beijing
+];
+routes.forEach(r => addPacket(r[0],r[1],r[2],r[3],r[4]));
+
+/* ── LIVE COUNTERS (slide 9) ────────────────── */
+let countersStarted = false;
+function startCounters() {
+  if (countersStarted) return;
+  countersStarted = true;
+  const targets = { phish:1240, deep:382, ransom:118, breach:47 };
+  const current = { phish:0, deep:0, ransom:0, breach:0 };
+  const step = (key, el, target) => {
+    const inc = Math.ceil(target / 60);
+    const interval = setInterval(() => {
+      current[key] = Math.min(current[key] + inc, target);
+      el.textContent = current[key].toLocaleString('ar');
+      if (current[key] >= target) {
+        clearInterval(interval);
+        // keep ticking realistically
+        setInterval(() => {
+          const delta = Math.floor(Math.random()*3)-1;
+          current[key] = Math.max(1, current[key] + delta);
+          el.textContent = current[key].toLocaleString('ar');
+        }, 1800);
+      }
+    }, 25);
+  };
+  step('phish',  document.getElementById('cnt-phish'),  targets.phish);
+  step('deep',   document.getElementById('cnt-deep'),   targets.deep);
+  step('ransom', document.getElementById('cnt-ransom'), targets.ransom);
+  step('breach', document.getElementById('cnt-breach'), targets.breach);
+}
+
+/* ── TABS (slide 10) ────────────────────────── */
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+  updateProgress();
+}
+
+/* ── CHECKLIST ───────────────────────────────── */
+function toggleCheck(el) {
+  el.classList.toggle('done');
+  updateProgress();
+}
+
+function updateProgress() {
+  const activePane = document.querySelector('.tab-pane.active');
+  if (!activePane) return;
+  const items   = activePane.querySelectorAll('.check-item');
+  const done    = activePane.querySelectorAll('.check-item.done');
+  const pct     = items.length ? Math.round(done.length / items.length * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = done.length + ' / ' + items.length + ' مكتمل';
+}
+updateProgress();
 </script>
 </body>
 </html>
