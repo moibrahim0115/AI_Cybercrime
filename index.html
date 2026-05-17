@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>الذكاء الاصطناعي والجرائم الإلكترونية · مايو 2026</title>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
 
@@ -121,50 +125,126 @@
   .presenter-item:hover { border-color:rgba(0,212,255,.3); box-shadow:var(--glow); transform:translateY(-2px); }
   .presenter-name { font-size:1.15rem; font-weight:700; color:var(--primary); }
 
-  /* ─────────────────────────────────────────────────────────────
-     SLIDE 9 — INTERACTIVE THREAT MAP
-  ───────────────────────────────────────────────────────────── */
+  /* ════════════════════════════════════════════════════
+     SLIDE 9 — LEAFLET MAP (UPGRADED)
+  ════════════════════════════════════════════════════ */
   .map-wrapper {
-    position:relative; width:100%; max-width:900px;
-    background:rgba(5,10,24,.7); border:1px solid rgba(0,212,255,.2);
-    border-radius:20px; padding:18px; backdrop-filter:blur(8px);
-  }
-  .map-svg { width:100%; }
-  .atk-dot { cursor:pointer; transition:r .2s; }
-  .atk-dot:hover { r:9; }
-  .atk-pulse { transform-origin:center; animation:pulse 2s infinite; }
-  @keyframes pulse {
-    0%,100%{opacity:.8;r:6}
-    50%{opacity:.2;r:12}
+    position: relative;
+    width: 100%;
+    max-width: 960px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(0,212,255,.25);
+    box-shadow: 0 0 40px rgba(0,212,255,.08), inset 0 0 0 1px rgba(0,212,255,.1);
   }
 
-  .map-tooltip {
-    position:absolute; background:rgba(5,10,30,.95); border:1px solid rgba(0,212,255,.4);
-    border-radius:10px; padding:10px 14px; font-size:.78rem; pointer-events:none;
-    z-index:10; max-width:180px; box-shadow:var(--glow); display:none;
-    transition:opacity .2s;
+  #leafletMap {
+    width: 100%;
+    height: 340px;
+    background: #070e22;
+    direction: ltr; /* Leaflet needs LTR */
   }
-  .map-tooltip.show { display:block; }
-  .map-tooltip h4 { color:var(--primary); margin-bottom:4px; font-size:.82rem; }
-  .map-tooltip p  { color:var(--text-muted); }
 
+  /* Pulse marker styles */
+  .lf-pulse-wrap {
+    position: relative;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+  }
+  .lf-pulse-core {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--mc);
+    box-shadow: 0 0 10px var(--mc), 0 0 20px var(--mc);
+    z-index: 2;
+  }
+  .lf-pulse-ring {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%) scale(0.3);
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid var(--mc);
+    animation: lfRingOut 2.2s ease-out infinite;
+    opacity: 0;
+  }
+  .lf-pulse-ring:nth-child(2) { animation-delay: .75s; }
+  .lf-pulse-ring:nth-child(3) { animation-delay: 1.5s; }
+  @keyframes lfRingOut {
+    0%   { transform: translate(-50%,-50%) scale(0.3); opacity: .9; }
+    100% { transform: translate(-50%,-50%) scale(3.2); opacity: 0; }
+  }
+
+  /* Attack line animation — targets Leaflet SVG paths */
+  .attack-anim {
+    animation: dashFlow 2s linear infinite !important;
+  }
+  @keyframes dashFlow {
+    from { stroke-dashoffset: 40; }
+    to   { stroke-dashoffset: 0;  }
+  }
+
+  /* Leaflet popup override */
+  .lf-popup-wrapper .leaflet-popup-content-wrapper {
+    background: rgba(5,10,30,.96) !important;
+    border: 1px solid rgba(0,212,255,.35) !important;
+    border-radius: 12px !important;
+    color: #e8f4f8 !important;
+    font-family: 'Cairo', sans-serif !important;
+    box-shadow: 0 0 24px rgba(0,212,255,.25) !important;
+    backdrop-filter: blur(14px);
+    direction: rtl;
+    padding: 0 !important;
+  }
+  .lf-popup-wrapper .leaflet-popup-content {
+    margin: 0 !important;
+    padding: 12px 16px !important;
+    min-width: 170px;
+  }
+  .lf-popup-wrapper .leaflet-popup-tip-container { display: none; }
+  .lf-popup-wrapper .leaflet-popup-close-button {
+    color: rgba(0,212,255,.7) !important;
+    font-size: 16px !important;
+    top: 6px !important; right: 8px !important;
+  }
+  .lf-popup-title  { font-size: .92rem; font-weight: 700; margin-bottom: 4px; }
+  .lf-popup-type   { font-size: .76rem; font-weight: 600; display: block; margin-bottom: 5px; }
+  .lf-popup-count  { font-size: .75rem; color: #8aa0b8; display: block; margin-bottom: 6px; }
+  .lf-popup-role   { font-size: .7rem; padding: 2px 8px; border-radius: 20px; display: inline-block; }
+  .lf-popup-role.source { background: rgba(255,71,87,.15); color: #ff7088; border: 1px solid rgba(255,71,87,.3); }
+  .lf-popup-role.target { background: rgba(0,212,255,.1);  color: #00d4ff; border: 1px solid rgba(0,212,255,.25); }
+
+  /* Leaflet attribution */
+  .leaflet-control-attribution {
+    background: rgba(0,0,0,.4) !important;
+    color: rgba(255,255,255,.2) !important;
+    font-size: 9px !important;
+  }
+  .leaflet-control-attribution a { color: rgba(0,212,255,.4) !important; }
+
+  /* Live counters */
   .live-counters {
-    display:flex; gap:18px; margin-bottom:14px; flex-wrap:wrap; justify-content:center;
+    display:flex; gap:14px; flex-wrap:wrap; justify-content:center; width:100%; max-width:960px;
   }
   .counter-box {
-    background:var(--bg-card); border:1px solid rgba(0,212,255,.2); border-radius:12px;
-    padding:10px 18px; text-align:center; min-width:120px;
+    background:var(--bg-card); border:1px solid rgba(0,212,255,.18); border-radius:14px;
+    padding:10px 20px; text-align:center; flex:1; min-width:110px;
+    transition: border-color .3s, box-shadow .3s;
   }
-  .counter-val { font-size:1.5rem; font-weight:900; color:var(--accent); font-variant-numeric:tabular-nums; }
-  .counter-lbl { font-size:.7rem; color:var(--text-muted); margin-top:2px; }
+  .counter-box:hover { border-color:rgba(0,212,255,.4); box-shadow:var(--glow); }
+  .counter-val { font-size:1.5rem; font-weight:900; font-variant-numeric:tabular-nums; color:var(--accent); }
+  .counter-lbl { font-size:.68rem; color:var(--text-muted); margin-top:3px; line-height:1.4; }
 
-  .map-legend { display:flex; gap:16px; margin-top:10px; flex-wrap:wrap; justify-content:center; }
-  .legend-item { display:flex; align-items:center; gap:6px; font-size:.75rem; color:var(--text-muted); }
-  .legend-dot  { width:10px; height:10px; border-radius:50%; }
+  /* Map legend */
+  .map-legend { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
+  .legend-item { display:flex; align-items:center; gap:6px; font-size:.73rem; color:var(--text-muted); }
+  .legend-dot  { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
 
-  /* ─────────────────────────────────────────────────────────────
-     SLIDE 10 — INTERACTIVE DEFENSE
-  ───────────────────────────────────────────────────────────── */
+  /* ── TABS (slide 10) ── */
   .tab-row {
     display:flex; gap:8px; background:rgba(255,255,255,.04); border-radius:12px; padding:6px;
     width:100%; max-width:700px;
@@ -222,6 +302,7 @@
     .slide { padding:20px; }
     .nav-btn { width:38px; height:38px; font-size:14px; }
     .tab-pane.active { grid-template-columns:1fr; }
+    #leafletMap { height: 260px; }
   }
 </style>
 </head>
@@ -427,7 +508,7 @@
   </div>
 </div>
 
-<!-- ══ 9 – INTERACTIVE THREAT MAP ════════════════════════════════════ -->
+<!-- ══ 9 – LEAFLET THREAT MAP ════════════════════════════════════════ -->
 <div class="slide" id="slide-9">
   <div class="slide-inner">
     <span class="badge badge-cyan">لوحة التهديدات — تفاعلية</span>
@@ -436,68 +517,30 @@
 
     <!-- Live counters -->
     <div class="live-counters">
-      <div class="counter-box"><div class="counter-val" id="cnt-phish">0</div><div class="counter-lbl">هجمة تصيد / دقيقة</div></div>
-      <div class="counter-box"><div class="counter-val" id="cnt-deep" style="color:var(--gold)">0</div><div class="counter-lbl">Deepfake محاولة / ساعة</div></div>
-      <div class="counter-box"><div class="counter-val" id="cnt-ransom" style="color:#b57bff">0</div><div class="counter-lbl">برنامج فدية نشط</div></div>
-      <div class="counter-box"><div class="counter-val" id="cnt-breach" style="color:var(--green)">0</div><div class="counter-lbl">اختراق بيانات اليوم</div></div>
-    </div>
-
-    <!-- Map -->
-    <div class="map-wrapper">
-      <div class="map-tooltip" id="mapTooltip">
-        <h4 id="tt-title"></h4><p id="tt-desc"></p>
+      <div class="counter-box">
+        <div class="counter-val" id="cnt-phish">0</div>
+        <div class="counter-lbl">هجمة تصيد / دقيقة</div>
       </div>
-      <svg class="map-svg" viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg" id="mapSVG">
-        <!-- Ocean background -->
-        <rect width="900" height="380" fill="#070e22" rx="14"/>
-        <!-- Simplified continent shapes -->
-        <!-- North America -->
-        <path d="M80,70 L180,60 L220,80 L230,140 L200,180 L160,200 L130,190 L100,160 L70,120 Z" fill="#0d1c35" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
-        <!-- South America -->
-        <path d="M160,220 L200,210 L220,250 L210,310 L190,340 L160,330 L145,290 L150,250 Z" fill="#0d1c35" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
-        <!-- Europe -->
-        <path d="M380,50 L440,45 L460,70 L450,110 L410,120 L380,100 L365,75 Z" fill="#0d1c35" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
-        <!-- Africa -->
-        <path d="M380,130 L440,125 L460,170 L450,260 L420,300 L390,290 L370,250 L365,180 Z" fill="#0d1c35" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
-        <!-- Middle East -->
-        <path d="M460,110 L520,100 L540,130 L520,170 L470,165 L455,145 Z" fill="#0d1c35" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
-        <!-- Asia -->
-        <path d="M530,40 L700,30 L760,60 L780,120 L740,160 L680,170 L620,150 L560,160 L530,130 L520,80 Z" fill="#0d1c35" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
-        <!-- South Asia -->
-        <path d="M580,170 L640,165 L660,210 L630,250 L590,240 L570,200 Z" fill="#0d1c35" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
-        <!-- Southeast Asia -->
-        <path d="M700,170 L760,160 L790,200 L770,240 L720,230 L695,200 Z" fill="#0d1c35" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
-        <!-- Australia -->
-        <path d="M720,270 L800,265 L830,300 L810,340 L760,345 L720,320 Z" fill="#0d1c35" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
-
-        <!-- Grid lines -->
-        <line x1="0" y1="190" x2="900" y2="190" stroke="rgba(0,212,255,0.06)" stroke-width="1"/>
-        <line x1="450" y1="0" x2="450" y2="380" stroke="rgba(0,212,255,0.06)" stroke-width="1"/>
-
-        <!-- Attack pulses (animated) -->
-        <g id="attackLayer"></g>
-
-        <!-- Connection lines (will be added by JS) -->
-        <g id="lineLayer"></g>
-
-        <!-- Attack nodes (clickable) -->
-        <circle class="atk-dot" data-city="نيويورك" data-type="AI Phishing" data-count="1,240 هجمة/دقيقة" data-color="#ff4757" cx="175" cy="115" r="6" fill="#ff4757" opacity=".85"/>
-        <circle class="atk-dot" data-city="لندن" data-type="Deepfake" data-count="380 محاولة/ساعة" data-color="#ffd740" cx="400" cy="72" r="6" fill="#ffd740" opacity=".85"/>
-        <circle class="atk-dot" data-city="موسكو" data-type="APT / State Actor" data-count="52 عملية نشطة" data-color="#b57bff" cx="490" cy="58" r="7" fill="#b57bff" opacity=".85"/>
-        <circle class="atk-dot" data-city="بكين" data-type="Agentic AI Attack" data-count="890 وكيل نشط" data-color="#00d4ff" cx="700" cy="95" r="7" fill="#00d4ff" opacity=".85"/>
-        <circle class="atk-dot" data-city="منطقة الشرق الأوسط" data-type="Ransomware-as-a-Service" data-count="120 مؤسسة مستهدفة" data-color="#ff8c00" cx="500" cy="135" r="6" fill="#ff8c00" opacity=".85"/>
-        <circle class="atk-dot" data-city="نيجيريا" data-type="Fraud-as-a-Service" data-count="640 حملة/يوم" data-color="#ff4757" cx="400" cy="220" r="5" fill="#ff4757" opacity=".85"/>
-        <circle class="atk-dot" data-city="سنغافورة" data-type="Supply Chain Attack" data-count="34 مؤسسة" data-color="#10B981" cx="730" cy="200" r="5" fill="#10B981" opacity=".85"/>
-        <circle class="atk-dot" data-city="برازيليا" data-type="Synthetic Identity" data-count="420 هوية مزيفة/يوم" data-color="#ffd740" cx="185" cy="270" r="5" fill="#ffd740" opacity=".85"/>
-
-        <!-- Pulse animations -->
-        <circle class="atk-pulse" cx="175" cy="115" r="6" fill="none" stroke="#ff4757" stroke-width="1.5" opacity=".5"/>
-        <circle class="atk-pulse" cx="490" cy="58" r="7" fill="none" stroke="#b57bff" stroke-width="1.5" opacity=".5" style="animation-delay:.4s"/>
-        <circle class="atk-pulse" cx="700" cy="95" r="7" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity=".5" style="animation-delay:.8s"/>
-        <circle class="atk-pulse" cx="500" cy="135" r="6" fill="none" stroke="#ff8c00" stroke-width="1.5" opacity=".5" style="animation-delay:1.2s"/>
-      </svg>
+      <div class="counter-box">
+        <div class="counter-val" id="cnt-deep" style="color:var(--gold)">0</div>
+        <div class="counter-lbl">Deepfake محاولة / ساعة</div>
+      </div>
+      <div class="counter-box">
+        <div class="counter-val" id="cnt-ransom" style="color:#b57bff">0</div>
+        <div class="counter-lbl">برنامج فدية نشط</div>
+      </div>
+      <div class="counter-box">
+        <div class="counter-val" id="cnt-breach" style="color:var(--green)">0</div>
+        <div class="counter-lbl">اختراق بيانات اليوم</div>
+      </div>
     </div>
 
+    <!-- Leaflet Map -->
+    <div class="map-wrapper">
+      <div id="leafletMap" style="width:100%;height:340px;min-height:340px;background:#070e22;"></div>
+    </div>
+
+    <!-- Legend -->
     <div class="map-legend">
       <div class="legend-item"><div class="legend-dot" style="background:#ff4757"></div>AI Phishing / Fraud</div>
       <div class="legend-item"><div class="legend-dot" style="background:#ffd740"></div>Deepfake</div>
@@ -506,7 +549,7 @@
       <div class="legend-item"><div class="legend-dot" style="background:#ff8c00"></div>Ransomware</div>
       <div class="legend-item"><div class="legend-dot" style="background:#10B981"></div>Supply Chain</div>
     </div>
-    <p style="color:var(--text-muted);font-size:.75rem;">انقر على أي نقطة لمزيد من التفاصيل — الأرقام تحاكي معدلات الهجمات الفعلية</p>
+    <p style="color:var(--text-muted);font-size:.75rem;">انقر على أي نقطة لمزيد من التفاصيل • الخريطة تعمل بـ Leaflet + CartoDB Dark Matter</p>
   </div>
 </div>
 
@@ -517,13 +560,11 @@
     <h2>دليل <span class="gradient-text">الحماية والمواجهة</span></h2>
     <div class="divider"></div>
 
-    <!-- Tabs -->
     <div class="tab-row">
       <button class="tab-btn active" onclick="switchTab('individuals',this)">🔐 للأفراد</button>
       <button class="tab-btn" onclick="switchTab('orgs',this)">🏛️ للمؤسسات</button>
     </div>
 
-    <!-- Progress -->
     <div class="progress-wrap">
       <div class="progress-label">
         <span style="color:var(--primary)">تقدمك في تطبيق الحماية</span>
@@ -532,7 +573,6 @@
       <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
     </div>
 
-    <!-- Individuals tab -->
     <div class="tab-pane active" id="tab-individuals">
       <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>كلمات مرور قوية + Passkeys</h4><p>استخدم مدير كلمات مرور + تفعيل المصادقة الثنائية (2FA) على كل الحسابات</p></div></div>
       <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>تحقق قبل أي إجراء مالي</h4><p>اتصل بالشخص مباشرة على رقم تعرفه قبل أي تحويل — حتى لو كان الصوت أو الفيديو مقنعاً</p></div></div>
@@ -543,7 +583,6 @@
       <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>نظّف بصمتك الرقمية</h4><p>قلّل المعلومات الشخصية العامة — كل بيانة تُساعد المهاجم على بناء هويتك الاصطناعية</p></div></div>
     </div>
 
-    <!-- Orgs tab -->
     <div class="tab-pane" id="tab-orgs">
       <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>معمارية Zero Trust (NIST 800-207)</h4><p>لا ثقة بأي جهاز أو مستخدم دون تحقق مستمر — حتى داخل الشبكة</p></div></div>
       <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>UEBA — تحليل سلوكي بالذكاء الاصطناعي</h4><p>رصد الانحرافات عن السلوك الطبيعي للمستخدمين والأجهزة في الوقت الفعلي</p></div></div>
@@ -554,7 +593,6 @@
       <div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-text"><h4>نسخ احتياطية معزولة (Air-Gapped)</h4><p>برامج الفدية الذكية تستهدف النسخ الاحتياطية المتصلة — يجب عزلها كلياً</p></div></div>
     </div>
 
-    <!-- AI Defense box -->
     <div class="defense-ai-box">
       <div class="ai-box-icon">🤖</div>
       <div class="ai-box-text">
@@ -626,8 +664,13 @@
 
 </div><!-- end slides-container -->
 
+<!-- Leaflet JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
 <script>
-/* ── SLIDE ENGINE ─────────────────────────── */
+/* ══════════════════════════════════════════════
+   SLIDE ENGINE
+══════════════════════════════════════════════ */
 const TOTAL = 14;
 let current = 0;
 
@@ -649,7 +692,15 @@ function goTo(n) {
   document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i === current));
   document.getElementById('slideNum').textContent =
     String(current+1).padStart(2,'0') + ' / ' + String(TOTAL).padStart(2,'0');
-  if (current === 9) startCounters();
+
+  if (current === 9) {
+    startCounters();
+    // Slide transition = 550ms — fire invalidateSize at multiple points
+    setTimeout(initLeafletMap, 100);
+    setTimeout(initLeafletMap, 400);
+    setTimeout(initLeafletMap, 700);
+    setTimeout(initLeafletMap, 1200);
+  }
 }
 
 function changeSlide(dir) { goTo(current + dir); }
@@ -665,7 +716,9 @@ document.addEventListener('touchend',   e => {
   if (Math.abs(dx) > 50) changeSlide(dx > 0 ? -1 : 1);
 });
 
-/* ── QUIZ ─────────────────────────────────── */
+/* ══════════════════════════════════════════════
+   QUIZ
+══════════════════════════════════════════════ */
 const quizGroups = {};
 function checkQ(el, group, correct) {
   if (quizGroups[group]) return;
@@ -681,94 +734,174 @@ function checkQ(el, group, correct) {
   }
 }
 
-/* ── MAP TOOLTIP ───────────────────────────── */
-const tooltip = document.getElementById('mapTooltip');
-document.querySelectorAll('.atk-dot').forEach(dot => {
-  dot.addEventListener('mouseenter', e => {
-    const svg = document.getElementById('mapSVG');
-    const rect = svg.getBoundingClientRect();
-    const wrapper = document.querySelector('.map-wrapper');
-    const wRect = wrapper.getBoundingClientRect();
-    const cx = parseFloat(dot.getAttribute('cx'));
-    const cy = parseFloat(dot.getAttribute('cy'));
-    const scaleX = rect.width / 900;
-    const scaleY = rect.height / 380;
-    const px = cx * scaleX + (rect.left - wRect.left);
-    const py = cy * scaleY + (rect.top  - wRect.top);
-    document.getElementById('tt-title').textContent = dot.dataset.city;
-    document.getElementById('tt-desc').innerHTML =
-      `<span style="color:${dot.dataset.color}">${dot.dataset.type}</span><br>${dot.dataset.count}`;
-    tooltip.style.left = (px + 12) + 'px';
-    tooltip.style.top  = (py - 10) + 'px';
-    tooltip.classList.add('show');
-  });
-  dot.addEventListener('mouseleave', () => tooltip.classList.remove('show'));
-});
+/* ══════════════════════════════════════════════
+   LEAFLET MAP — SLIDE 9
+══════════════════════════════════════════════ */
+let _mapInstance = null;
+let _mapReady    = false;
 
-/* ── ANIMATED FLYING PACKETS ─────────────────── */
-function addPacket(x1,y1,x2,y2,color) {
-  const svg = document.getElementById('mapSVG');
-  const lineLayer = document.getElementById('lineLayer');
-  // faint beam
-  const beam = document.createElementNS('http://www.w3.org/2000/svg','line');
-  beam.setAttribute('x1',x1); beam.setAttribute('y1',y1);
-  beam.setAttribute('x2',x2); beam.setAttribute('y2',y2);
-  beam.setAttribute('stroke',color); beam.setAttribute('stroke-width','0.5');
-  beam.setAttribute('opacity','0.18'); beam.setAttribute('stroke-dasharray','4 8');
-  lineLayer.appendChild(beam);
-  // travelling dot
-  const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
-  circle.setAttribute('r','3'); circle.setAttribute('fill',color);
-  const anim = document.createElementNS('http://www.w3.org/2000/svg','animateMotion');
-  anim.setAttribute('dur', (1.5 + Math.random()*1.5)+'s');
-  anim.setAttribute('repeatCount','indefinite');
-  anim.setAttribute('path',`M${x1},${y1} L${x2},${y2}`);
-  circle.appendChild(anim);
-  lineLayer.appendChild(circle);
+function initLeafletMap() {
+  const container = document.getElementById('leafletMap');
+  if (!container) return;
+
+  /* If already built, just refresh size */
+  if (_mapInstance) {
+    _mapInstance.invalidateSize({ animate: false });
+    return;
+  }
+
+  /* Guard: don't double-init */
+  if (_mapReady) return;
+  _mapReady = true;
+
+  const map = L.map('leafletMap', {
+    center: [25, 15],
+    zoom: 2,
+    minZoom: 1,
+    maxZoom: 5,
+    zoomControl: true,
+    attributionControl: true,
+    scrollWheelZoom: false,
+    doubleClickZoom: false,
+    worldCopyJump: false
+  });
+  _mapInstance = map;
+
+  /* CartoDB Dark Matter — professional dark basemap */
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_matter/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://carto.com">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 20
+  }).addTo(map);
+
+  /* ── City data ── */
+  const cities = [
+    { id:'ny',  name:'نيويورك',             lat:40.71,  lng:-74.00,  type:'AI Phishing',             count:'1,240 هجمة / دقيقة',     color:'#ff4757', role:'target'  },
+    { id:'lon', name:'لندن',                lat:51.51,  lng:-0.12,   type:'Deepfake & CEO Fraud',     count:'380 محاولة / ساعة',       color:'#ffd740', role:'target'  },
+    { id:'msc', name:'موسكو',               lat:55.75,  lng:37.62,   type:'APT / State Actor',        count:'52 عملية نشطة',           color:'#b57bff', role:'source'  },
+    { id:'bj',  name:'بكين',                lat:39.91,  lng:116.39,  type:'Agentic AI Attack',        count:'890 وكيل نشط',            color:'#00d4ff', role:'source'  },
+    { id:'me',  name:'الشرق الأوسط',        lat:24.69,  lng:46.72,   type:'Ransomware-as-a-Service',  count:'120 مؤسسة مستهدفة',      color:'#ff8c00', role:'target'  },
+    { id:'ng',  name:'نيجيريا',             lat:6.45,   lng:3.39,    type:'Fraud-as-a-Service',       count:'640 حملة / يوم',          color:'#ff4757', role:'source'  },
+    { id:'sg',  name:'سنغافورة',            lat:1.35,   lng:103.82,  type:'Supply Chain Attack',      count:'34 مؤسسة',               color:'#10B981', role:'source'  },
+    { id:'br',  name:'برازيليا',            lat:-15.79, lng:-47.88,  type:'Synthetic Identity',       count:'420 هوية مزيفة / يوم',   color:'#ffd740', role:'target'  },
+  ];
+
+  /* ── Attack routes [source → target] ── */
+  const routes = [
+    ['msc','lon'],
+    ['bj', 'ny'],
+    ['bj', 'me'],
+    ['ng', 'lon'],
+    ['me', 'lon'],
+    ['br', 'ny'],
+    ['sg', 'bj'],
+  ];
+
+  const cityMap = {};
+  cities.forEach(c => cityMap[c.id] = c);
+
+  /* ── Draw animated attack lines ── */
+  routes.forEach(([srcId, dstId]) => {
+    const s = cityMap[srcId], d = cityMap[dstId];
+    if (!s || !d) return;
+
+    const poly = L.polyline(
+      [[s.lat, s.lng], [d.lat, d.lng]],
+      {
+        color: s.color,
+        weight: 1.8,
+        opacity: 0.55,
+        dashArray: '8 14',
+        lineCap: 'round'
+      }
+    ).addTo(map);
+
+    /* Apply CSS animation to the SVG path Leaflet creates */
+    setTimeout(() => {
+      const el = poly.getElement();
+      if (el) {
+        el.classList.add('attack-anim');
+        el.style.animationDuration = (1.8 + Math.random() * 1.2) + 's';
+      }
+    }, 200);
+  });
+
+  /* ── Add pulse markers ── */
+  cities.forEach(city => {
+    const icon = L.divIcon({
+      className: '',
+      html: `
+        <div class="lf-pulse-wrap" style="--mc:${city.color}">
+          <div class="lf-pulse-ring"></div>
+          <div class="lf-pulse-ring"></div>
+          <div class="lf-pulse-ring"></div>
+          <div class="lf-pulse-core"></div>
+        </div>`,
+      iconSize:   [28, 28],
+      iconAnchor: [14, 14],
+      popupAnchor:[0, -18]
+    });
+
+    const roleLabel = city.role === 'source'
+      ? '<span class="lf-popup-role source">🔴 مصدر الهجوم</span>'
+      : '<span class="lf-popup-role target">🎯 هدف</span>';
+
+    const popup = L.popup({ className: 'lf-popup-wrapper', maxWidth: 210 }).setContent(`
+      <div>
+        <div class="lf-popup-title" style="color:${city.color}">${city.name}</div>
+        <span class="lf-popup-type" style="color:${city.color}">${city.type}</span>
+        <span class="lf-popup-count">${city.count}</span>
+        ${roleLabel}
+      </div>
+    `);
+
+    L.marker([city.lat, city.lng], { icon })
+      .addTo(map)
+      .bindPopup(popup);
+  });
+
+  /* Fix size after transition finishes */
+  setTimeout(() => map.invalidateSize({ animate:false }), 200);
+  setTimeout(() => map.invalidateSize({ animate:false }), 600);
+  setTimeout(() => map.invalidateSize({ animate:false }), 1000);
 }
 
-// Attack routes (src -> target, color)
-const routes = [
-  [490,58, 400,72, '#b57bff'],  // Moscow → London
-  [700,95, 175,115,'#00d4ff'],  // Beijing → New York
-  [400,220,400,72, '#ff4757'],  // Nigeria → London
-  [500,135,400,72, '#ff8c00'],  // Middle East → London
-  [700,95, 500,135,'#00d4ff'],  // Beijing → Middle East
-  [185,270,175,115,'#ffd740'],  // Brazil → New York
-  [730,200,700,95, '#10B981'],  // Singapore → Beijing
-];
-routes.forEach(r => addPacket(r[0],r[1],r[2],r[3],r[4]));
-
-/* ── LIVE COUNTERS (slide 9) ────────────────── */
+/* ══════════════════════════════════════════════
+   LIVE COUNTERS — SLIDE 9
+══════════════════════════════════════════════ */
 let countersStarted = false;
 function startCounters() {
   if (countersStarted) return;
   countersStarted = true;
+
   const targets = { phish:1240, deep:382, ransom:118, breach:47 };
-  const current = { phish:0, deep:0, ransom:0, breach:0 };
-  const step = (key, el, target) => {
-    const inc = Math.ceil(target / 60);
-    const interval = setInterval(() => {
-      current[key] = Math.min(current[key] + inc, target);
-      el.textContent = current[key].toLocaleString('ar');
-      if (current[key] >= target) {
-        clearInterval(interval);
-        // keep ticking realistically
+  const vals    = { phish:0,    deep:0,   ransom:0,   breach:0  };
+
+  const animate = (key, elId, target) => {
+    const el  = document.getElementById(elId);
+    const inc = Math.ceil(target / 55);
+    const iv  = setInterval(() => {
+      vals[key] = Math.min(vals[key] + inc, target);
+      el.textContent = vals[key].toLocaleString('ar');
+      if (vals[key] >= target) {
+        clearInterval(iv);
         setInterval(() => {
-          const delta = Math.floor(Math.random()*3)-1;
-          current[key] = Math.max(1, current[key] + delta);
-          el.textContent = current[key].toLocaleString('ar');
-        }, 1800);
+          vals[key] = Math.max(1, vals[key] + (Math.random() > 0.5 ? 1 : -1));
+          el.textContent = vals[key].toLocaleString('ar');
+        }, 1600 + Math.random() * 800);
       }
-    }, 25);
+    }, 22);
   };
-  step('phish',  document.getElementById('cnt-phish'),  targets.phish);
-  step('deep',   document.getElementById('cnt-deep'),   targets.deep);
-  step('ransom', document.getElementById('cnt-ransom'), targets.ransom);
-  step('breach', document.getElementById('cnt-breach'), targets.breach);
+
+  animate('phish',  'cnt-phish',  targets.phish);
+  animate('deep',   'cnt-deep',   targets.deep);
+  animate('ransom', 'cnt-ransom', targets.ransom);
+  animate('breach', 'cnt-breach', targets.breach);
 }
 
-/* ── TABS (slide 10) ────────────────────────── */
+/* ══════════════════════════════════════════════
+   TABS — SLIDE 10
+══════════════════════════════════════════════ */
 function switchTab(id, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
@@ -777,20 +910,19 @@ function switchTab(id, btn) {
   updateProgress();
 }
 
-/* ── CHECKLIST ───────────────────────────────── */
 function toggleCheck(el) {
   el.classList.toggle('done');
   updateProgress();
 }
 
 function updateProgress() {
-  const activePane = document.querySelector('.tab-pane.active');
-  if (!activePane) return;
-  const items   = activePane.querySelectorAll('.check-item');
-  const done    = activePane.querySelectorAll('.check-item.done');
-  const pct     = items.length ? Math.round(done.length / items.length * 100) : 0;
+  const pane  = document.querySelector('.tab-pane.active');
+  if (!pane) return;
+  const items = pane.querySelectorAll('.check-item');
+  const done  = pane.querySelectorAll('.check-item.done');
+  const pct   = items.length ? Math.round(done.length / items.length * 100) : 0;
   document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressText').textContent = done.length + ' / ' + items.length + ' مكتمل';
+  document.getElementById('progressText').textContent  = done.length + ' / ' + items.length + ' مكتمل';
 }
 updateProgress();
 </script>
