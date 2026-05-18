@@ -5,21 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>الذكاء الاصطناعي والجرائم الإلكترونية · مايو 2026</title>
 
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<!-- Leaflet CSS (unpkg — أقل مشاكل مع المسارات) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous"/>
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
 
   :root {
-    --primary: #00d4ff;
-    --secondary: #7b2ff7;
+    --primary: #00e5ff;
+    --secondary: #7000ff;
+    --secondary-soft: #b388ff;
     --accent: #ff4757;
-    --bg-dark: #050a18;
-    --bg-card: rgba(255,255,255,0.04);
-    --text: #e8f4f8;
-    --text-muted: #8aa0b8;
-    --glow: 0 0 30px rgba(0,212,255,0.3);
+    --bg-dark: #03050a;
+    --bg-card: rgba(255, 255, 255, 0.045);
+    --surface: rgba(15, 20, 35, 0.6);
+    --text: #f0f4f8;
+    --text-muted: #8b9bb4;
+    --glow: 0 0 40px rgba(0, 229, 255, 0.22);
     --green: #10B981;
     --gold: #ffd740;
   }
@@ -29,9 +31,17 @@
 
   body::before {
     content: ''; position: fixed; inset: 0;
-    background: linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),
-                linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);
-    background-size: 50px 50px; pointer-events: none; z-index: 0;
+    background:
+      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none; z-index: 0;
+  }
+
+  body::after {
+    content: ''; position: fixed; inset: 0;
+    background: radial-gradient(circle at center, rgba(112, 0, 255, 0.07) 0%, transparent 62%);
+    pointer-events: none; z-index: 0;
   }
 
   /* ── SLIDES ── */
@@ -42,19 +52,20 @@
     opacity: 0; transform: translateX(-60px);
     transition: all 0.55s cubic-bezier(0.4,0,0.2,1);
     pointer-events: none; overflow-y: auto;
+    z-index: 0; /* غير النشطة تحت النشطة — وإلا تغطي شرائح لاحقة في الـ DOM محتوى Leaflet */
   }
-  .slide.active  { opacity: 1; transform: translateX(0); pointer-events: all; }
-  .slide.exit    { opacity: 0; transform: translateX(60px); }
+  .slide.active  { opacity: 1; transform: translateX(0); pointer-events: all; z-index: 2; }
+  .slide.exit    { opacity: 0; transform: translateX(60px); z-index: 1; }
 
   /* ── NAV ── */
   .nav-btn {
     position: fixed; top: 50%; transform: translateY(-50%);
-    background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3);
+    background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.32);
     color: var(--primary); width: 50px; height: 50px; border-radius: 50%;
     cursor: pointer; font-size: 22px; transition: all 0.3s; z-index: 100;
     display: flex; align-items: center; justify-content: center;
   }
-  .nav-btn:hover { background: rgba(0,212,255,0.2); box-shadow: var(--glow); transform: translateY(-50%) scale(1.1); }
+  .nav-btn:hover { background: rgba(0, 229, 255, 0.2); box-shadow: var(--glow); transform: translateY(-50%) scale(1.1); }
   .nav-prev { right: 20px; }
   .nav-next { left: 20px; }
   .slide-num   { position:fixed; top:20px; left:30px; font-size:12px; color:var(--text-muted); z-index:100; letter-spacing:2px; }
@@ -62,7 +73,7 @@
 
   /* ── DOTS ── */
   .slide-counter { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); display:flex; gap:6px; z-index:100; flex-wrap:wrap; justify-content:center; max-width:90vw; }
-  .dot { width:7px; height:7px; border-radius:50%; background:rgba(0,212,255,0.22); cursor:pointer; transition:all .3s; }
+  .dot { width:7px; height:7px; border-radius:50%; background:rgba(0,229,255,0.24); cursor:pointer; transition:all .3s; }
   .dot.active { background:var(--primary); box-shadow:0 0 8px var(--primary); width:22px; border-radius:4px; }
 
   /* ── TYPE ── */
@@ -73,17 +84,17 @@
 
   .gradient-text { background:linear-gradient(135deg,var(--primary),var(--secondary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
   .badge { display:inline-block; padding:4px 14px; border-radius:20px; font-size:.68rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom:14px; }
-  .badge-cyan   { background:rgba(0,212,255,.15); color:var(--primary); border:1px solid rgba(0,212,255,.4); }
+  .badge-cyan   { background:rgba(0,229,255,.12); color:var(--primary); border:1px solid rgba(0,229,255,.38); }
   .badge-red    { background:rgba(255,71,87,.15);  color:var(--accent);  border:1px solid rgba(255,71,87,.4); }
-  .badge-purple { background:rgba(123,47,247,.15); color:#b57bff; border:1px solid rgba(123,47,247,.4); }
+  .badge-purple { background:rgba(112,0,255,.14); color:var(--secondary-soft); border:1px solid rgba(112,0,255,.42); }
   .divider { width:80px; height:4px; background:linear-gradient(90deg,var(--primary),var(--secondary)); border-radius:2px; margin:12px auto; }
 
   /* ── CARDS ── */
-  .card { background:var(--bg-card); border:1px solid rgba(0,212,255,.15); border-radius:16px; padding:18px 22px; backdrop-filter:blur(10px); transition:all .3s; }
-  .card:hover { border-color:rgba(0,212,255,.4); box-shadow:var(--glow); transform:translateY(-2px); }
+  .card { background:var(--bg-card); border:1px solid rgba(0,229,255,.14); border-radius:16px; padding:18px 22px; backdrop-filter:blur(10px); transition:all .3s; }
+  .card:hover { border-color:rgba(0,229,255,.38); box-shadow:var(--glow); transform:translateY(-2px); }
   .card-danger  { border-color:rgba(255,71,87,.25); }
   .card-danger:hover { border-color:rgba(255,71,87,.5); box-shadow:0 0 20px rgba(255,71,87,.2); }
-  .card-purple  { border-color:rgba(123,47,247,.25); }
+  .card-purple  { border-color:rgba(112,0,255,.28); }
 
   /* ── GRIDS ── */
   .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; width:100%; max-width:1060px; }
@@ -91,11 +102,11 @@
   .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; width:100%; max-width:1060px; }
 
   /* ── MISC ── */
-  .slide-inner  { width:100%; max-width:1100px; display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .slide-inner  { width:100%; max-width:1100px; margin-inline:auto; display:flex; flex-direction:column; align-items:center; gap:14px; }
   .icon-big { font-size:2.2rem; margin-bottom:8px; display:block; }
   .icon-med { font-size:1.6rem; margin-bottom:8px; display:block; }
   .stat-num { font-size:clamp(1.8rem,3.5vw,2.6rem); font-weight:900; background:linear-gradient(135deg,var(--primary),var(--secondary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-  .quote-box { background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(123,47,247,.08)); border-right:4px solid var(--primary); border-radius:0 12px 12px 0; padding:14px 18px; font-style:italic; font-size:.9rem; color:var(--primary); max-width:800px; width:100%; line-height:2; }
+  .quote-box { background:linear-gradient(135deg,rgba(0,229,255,.07),rgba(112,0,255,.08)); border-right:4px solid var(--primary); border-radius:0 12px 12px 0; padding:14px 18px; font-style:italic; font-size:.9rem; color:var(--primary); max-width:800px; width:100%; line-height:2; }
   .warning-band { background:linear-gradient(135deg,rgba(255,71,87,.1),rgba(255,71,87,.05)); border:1px solid rgba(255,71,87,.3); border-radius:12px; padding:12px 18px; display:flex; align-items:center; gap:12px; width:100%; max-width:900px; margin-top:12px; }
 
   /* ── LISTS ── */
@@ -116,33 +127,129 @@
   @keyframes barIn { from{width:0} }
 
   /* ── COVER ── */
-  #slide-0 { text-align:center; background:radial-gradient(ellipse at center,rgba(0,212,255,.06) 0%,transparent 70%); }
+  #slide-0 { text-align:center; background:radial-gradient(ellipse at center,rgba(0,229,255,.056) 0%,transparent 72%); }
   .pulse-ring { width:100px; height:100px; border-radius:50%; border:2px solid var(--primary); display:flex; align-items:center; justify-content:center; margin:0 auto 20px; animation:ring 2s ease infinite; }
-  @keyframes ring { 0%{box-shadow:0 0 0 0 rgba(0,212,255,.4)} 70%{box-shadow:0 0 0 18px rgba(0,212,255,0)} 100%{box-shadow:0 0 0 0 rgba(0,212,255,0)} }
+  @keyframes ring { 0%{box-shadow:0 0 0 0 rgba(0,229,255,.42)} 70%{box-shadow:0 0 0 18px rgba(0,229,255,0)} 100%{box-shadow:0 0 0 0 rgba(0,229,255,0)} }
 
   /* ── PRESENTER ── */
   .presenter-item { text-align:center; background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:16px 32px; backdrop-filter:blur(5px); transition:all .3s; }
-  .presenter-item:hover { border-color:rgba(0,212,255,.3); box-shadow:var(--glow); transform:translateY(-2px); }
+  .presenter-item:hover { border-color:rgba(0,229,255,.32); box-shadow:var(--glow); transform:translateY(-2px); }
   .presenter-name { font-size:1.15rem; font-weight:700; color:var(--primary); }
 
   /* ════════════════════════════════════════════════════
      SLIDE 9 — LEAFLET MAP (UPGRADED)
   ════════════════════════════════════════════════════ */
+  #slide-9.slide {
+    justify-content: center;
+    align-items: center;
+    padding: clamp(48px, 6vh, 72px) clamp(20px, 4vw, 48px) clamp(72px, 10vh, 100px);
+  }
+
+  #slide-9 .map-slide-layout {
+    width: min(1120px, calc(100vw - 96px));
+    max-width: min(1120px, calc(100vw - 96px));
+    margin-inline: auto;
+    flex: 0 1 auto;
+    min-height: 0;
+    gap: clamp(12px, 1.8vh, 20px);
+    align-items: center;
+    text-align: center;
+  }
+
+  #slide-9 .map-slide-header {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+    width: 100%;
+  }
+
+  #slide-9 .map-slide-header h2 {
+    font-size: clamp(1.2rem, 2.5vw, 1.85rem);
+    margin: 0;
+    line-height: 1.35;
+    max-width: 36ch;
+  }
+
+  #slide-9 .map-slide-header .badge {
+    margin-bottom: 0;
+  }
+
+  #slide-9 .map-slide-layout .divider {
+    margin: 4px auto 0;
+  }
+
   .map-wrapper {
     position: relative;
     width: 100%;
     max-width: 960px;
+    flex-shrink: 0;
+    min-height: 340px;
     border-radius: 18px;
     overflow: hidden;
-    border: 1px solid rgba(0,212,255,.25);
-    box-shadow: 0 0 40px rgba(0,212,255,.08), inset 0 0 0 1px rgba(0,212,255,.1);
+    border: 1px solid rgba(0,229,255,.25);
+    box-shadow: 0 0 40px rgba(0,229,255,.08), inset 0 0 0 1px rgba(0,229,255,.1);
+  }
+
+  #slide-9 .map-wrapper-main {
+    width: 100%;
+    max-width: 100%;
+    margin-inline: auto;
+    flex: 0 1 auto;
+    min-height: clamp(320px, 48vh, 620px);
+    align-self: center;
   }
 
   #leafletMap {
     width: 100%;
     height: 340px;
+    min-height: 340px;
     background: #070e22;
     direction: ltr; /* Leaflet needs LTR */
+    position: relative;
+    z-index: 1;
+  }
+
+  #slide-9 #leafletMap {
+    height: clamp(320px, 48vh, 620px);
+    min-height: clamp(320px, 48vh, 620px);
+  }
+
+  /* تجميع العدادات والمفتاح والملاحظة تحت الخريطة — عمود واحد في المنتصف */
+  #slide-9 .map-slide-bottom {
+    width: 100%;
+    max-width: 940px;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(8px, 1.5vh, 14px);
+  }
+
+  #slide-9 .map-slide-bottom .map-slide-counters,
+  #slide-9 .map-slide-bottom .map-slide-legend {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* مظهر داكن فوق OSM (البلاط يعمل في أغلب الشبكات) */
+  #slide-9 .leaflet-tile-pane {
+    filter: brightness(0.42) contrast(1.08) saturate(0.9);
+  }
+
+  /* RTL صفحة: Leaflet يحتاج LTR على الحاوية وكل الطبقات لتجنّب بلاط فارغ أو إزاحة */
+  #slide-9 .leaflet-container,
+  #slide-9 .leaflet-pane,
+  #slide-9 .leaflet-control {
+    direction: ltr !important;
+  }
+
+  /* حاوية التحكم فوق المنطقة نفس اتجاه الصفحة (عربي) */
+  #slide-9 .leaflet-control-attribution {
+    direction: rtl !important;
   }
 
   /* Pulse marker styles */
@@ -191,11 +298,11 @@
   /* Leaflet popup override */
   .lf-popup-wrapper .leaflet-popup-content-wrapper {
     background: rgba(5,10,30,.96) !important;
-    border: 1px solid rgba(0,212,255,.35) !important;
+    border: 1px solid rgba(0,229,255,.35) !important;
     border-radius: 12px !important;
     color: #e8f4f8 !important;
     font-family: 'Cairo', sans-serif !important;
-    box-shadow: 0 0 24px rgba(0,212,255,.25) !important;
+    box-shadow: 0 0 24px rgba(0,229,255,.25) !important;
     backdrop-filter: blur(14px);
     direction: rtl;
     padding: 0 !important;
@@ -207,7 +314,7 @@
   }
   .lf-popup-wrapper .leaflet-popup-tip-container { display: none; }
   .lf-popup-wrapper .leaflet-popup-close-button {
-    color: rgba(0,212,255,.7) !important;
+    color: rgba(0,229,255,.7) !important;
     font-size: 16px !important;
     top: 6px !important; right: 8px !important;
   }
@@ -216,7 +323,7 @@
   .lf-popup-count  { font-size: .75rem; color: #8aa0b8; display: block; margin-bottom: 6px; }
   .lf-popup-role   { font-size: .7rem; padding: 2px 8px; border-radius: 20px; display: inline-block; }
   .lf-popup-role.source { background: rgba(255,71,87,.15); color: #ff7088; border: 1px solid rgba(255,71,87,.3); }
-  .lf-popup-role.target { background: rgba(0,212,255,.1);  color: #00d4ff; border: 1px solid rgba(0,212,255,.25); }
+  .lf-popup-role.target { background: rgba(0,229,255,.1);  color: var(--primary); border: 1px solid rgba(0,229,255,.25); }
 
   /* Leaflet attribution */
   .leaflet-control-attribution {
@@ -224,25 +331,66 @@
     color: rgba(255,255,255,.2) !important;
     font-size: 9px !important;
   }
-  .leaflet-control-attribution a { color: rgba(0,212,255,.4) !important; }
+  .leaflet-control-attribution a { color: rgba(0,229,255,.4) !important; }
 
   /* Live counters */
   .live-counters {
     display:flex; gap:14px; flex-wrap:wrap; justify-content:center; width:100%; max-width:960px;
   }
   .counter-box {
-    background:var(--bg-card); border:1px solid rgba(0,212,255,.18); border-radius:14px;
+    background:var(--bg-card); border:1px solid rgba(0,229,255,.18); border-radius:14px;
     padding:10px 20px; text-align:center; flex:1; min-width:110px;
     transition: border-color .3s, box-shadow .3s;
   }
-  .counter-box:hover { border-color:rgba(0,212,255,.4); box-shadow:var(--glow); }
+  .counter-box:hover { border-color:rgba(0,229,255,.4); box-shadow:var(--glow); }
   .counter-val { font-size:1.5rem; font-weight:900; font-variant-numeric:tabular-nums; color:var(--accent); }
   .counter-lbl { font-size:.68rem; color:var(--text-muted); margin-top:3px; line-height:1.4; }
+
+  #slide-9 .map-slide-counters {
+    gap: clamp(8px, 2vw, 12px);
+    margin-top: 0;
+    flex-wrap: wrap;
+  }
+
+  #slide-9 .map-slide-counters .counter-box {
+    padding: 6px 12px;
+    border-radius: 10px;
+    min-width: 92px;
+    flex: 1 1 auto;
+  }
+
+  #slide-9 .map-slide-counters .counter-val {
+    font-size: clamp(1.1rem, 2.2vw, 1.35rem);
+  }
+
+  #slide-9 .map-slide-counters .counter-lbl {
+    font-size: .6rem;
+    line-height: 1.25;
+  }
 
   /* Map legend */
   .map-legend { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
   .legend-item { display:flex; align-items:center; gap:6px; font-size:.73rem; color:var(--text-muted); }
   .legend-dot  { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+
+  #slide-9 .map-slide-legend {
+    gap: 8px 14px;
+    margin-top: 0;
+    justify-content: center;
+  }
+
+  #slide-9 .map-slide-legend .legend-item {
+    font-size: .65rem;
+  }
+
+  #slide-9 .map-slide-footnote {
+    font-size: .7rem !important;
+    margin-top: 0 !important;
+    text-align: center;
+    max-width: 52ch;
+    line-height: 1.55;
+    opacity: 0.92;
+  }
 
   /* ── TABS (slide 10) ── */
   .tab-row {
@@ -261,15 +409,15 @@
 
   .check-item {
     display:flex; align-items:flex-start; gap:12px;
-    background:var(--bg-card); border:1px solid rgba(0,212,255,.15); border-radius:12px;
+    background:var(--bg-card); border:1px solid rgba(0,229,255,.15); border-radius:12px;
     padding:12px 16px; cursor:pointer; transition:all .25s; user-select:none;
   }
-  .check-item:hover { border-color:rgba(0,212,255,.35); background:rgba(255,255,255,.06); }
+  .check-item:hover { border-color:rgba(0,229,255,.35); background:rgba(255,255,255,.06); }
   .check-item.done { border-color:rgba(16,185,129,.4); background:rgba(16,185,129,.07); }
   .check-item.done .chk-box { background:var(--green); border-color:var(--green); }
   .check-item.done .chk-box::after { content:'✓'; color:#fff; font-size:.75rem; }
   .chk-box {
-    width:22px; height:22px; border-radius:6px; border:2px solid rgba(0,212,255,.4);
+    width:22px; height:22px; border-radius:6px; border:2px solid rgba(0,229,255,.4);
     flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center;
     transition:all .2s;
   }
@@ -282,8 +430,8 @@
   .progress-label { font-size:.78rem; color:var(--text-muted); display:flex; justify-content:space-between; }
 
   .defense-ai-box {
-    width:100%; max-width:980px; background:linear-gradient(135deg,rgba(0,212,255,.07),rgba(123,47,247,.07));
-    border:1px solid rgba(0,212,255,.25); border-radius:14px; padding:14px 20px;
+    width:100%; max-width:980px; background:linear-gradient(135deg,rgba(0,229,255,.07),rgba(112,0,255,.07));
+    border:1px solid rgba(0,229,255,.25); border-radius:14px; padding:14px 20px;
     display:flex; gap:16px; align-items:center; flex-wrap:wrap;
   }
   .ai-box-icon { font-size:2rem; flex-shrink:0; }
@@ -291,10 +439,242 @@
   .ai-box-text p  { color:var(--text-muted); font-size:.8rem; line-height:1.7; }
 
   /* QUIZ */
-  .quiz-choice { background:var(--bg-card); border:1px solid rgba(0,212,255,.25); border-radius:14px; padding:14px; cursor:pointer; transition:all .2s; text-align:center; font-size:.88rem; }
+  .quiz-choice { background:var(--bg-card); border:1px solid rgba(0,229,255,.25); border-radius:14px; padding:14px; cursor:pointer; transition:all .2s; text-align:center; font-size:.88rem; }
   .quiz-choice:hover { border-color:var(--primary); box-shadow:var(--glow); }
   .quiz-choice.correct { border-color:var(--green); background:rgba(16,185,129,.1); }
   .quiz-choice.wrong   { border-color:var(--accent); background:rgba(255,71,87,.1); }
+
+  /* ── SPLASH / تحميل — شبكة وبؤرة وبنفسجي مثل الواجهة العامة + لوجو الدماغ 🧠 ── */
+  #app-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: var(--bg-dark);
+    color: var(--text);
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.55s cubic-bezier(0.4,0,0.2,1), visibility 0.55s;
+    font-family: 'Cairo', sans-serif;
+  }
+
+  /* شبكة مائلة ومتحركة — لا تلمس خلفية body للعرض */
+  #app-loader::before {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    background:
+      linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+    background-size: 40px 40px;
+    transform: rotate(15deg);
+    animation: splashPanGrid 60s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes splashPanGrid {
+    0% { transform: translateY(0) rotate(15deg); }
+    100% { transform: translateY(-50px) rotate(15deg); }
+  }
+
+  /* بؤرة بنفسجية ناعمة */
+  #app-loader::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(112, 0, 255, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  #app-loader.is-done {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  #app-loader .load-screen {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    width: 100%;
+    max-width: 800px;
+  }
+
+  #app-loader .ai-core {
+    position: relative;
+    width: clamp(120px, 22vmin, 180px);
+    height: clamp(120px, 22vmin, 180px);
+    margin-bottom: clamp(1.25rem, 3vh, 2rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #app-loader .ai-core-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid transparent;
+  }
+
+  #app-loader .ring-1 {
+    width: 100%;
+    height: 100%;
+    border-top-color: var(--primary);
+    border-bottom-color: var(--secondary);
+    animation: splashSpinSlow 3s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+  }
+
+  #app-loader .ring-2 {
+    width: 75%;
+    height: 75%;
+    border-right-color: var(--secondary);
+    border-left-color: var(--primary);
+    animation: splashSpinSlow 2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite reverse;
+  }
+
+  #app-loader .splash-brain-logo {
+    position: relative;
+    z-index: 2;
+    font-size: clamp(2.85rem, 11vmin, 4.85rem);
+    line-height: 1;
+    filter: drop-shadow(0 0 18px rgba(0, 229, 255, 0.5)) drop-shadow(0 0 28px rgba(112, 0, 255, 0.38));
+    animation: splashBrainPulse 2.2s ease-in-out infinite alternate;
+  }
+
+  @keyframes splashBrainPulse {
+    0% { transform: scale(0.94); opacity: 0.9; }
+    100% { transform: scale(1.06); opacity: 1; }
+  }
+
+  @keyframes splashSpinSlow {
+    100% { transform: rotate(360deg); }
+  }
+
+  #app-loader .load-badge {
+    display: inline-block;
+    padding: 4px 16px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: rgba(0, 229, 255, 0.05);
+    color: var(--primary);
+    border: 1px solid rgba(0, 229, 255, 0.22);
+    backdrop-filter: blur(4px);
+    margin-bottom: 1rem;
+  }
+
+  #app-loader .load-title {
+    font-size: clamp(1.65rem, 4vw, 2.75rem);
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.35rem;
+    color: var(--text);
+  }
+
+  #app-loader .load-title .gradient {
+    background: linear-gradient(135deg, #fff 12%, var(--primary) 88%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  #app-loader .load-subtitle {
+    font-size: clamp(1rem, 2.6vw, 1.65rem);
+    font-weight: 400;
+    color: var(--text-muted);
+    line-height: 1.35;
+  }
+
+  #app-loader .progress-wrapper {
+    width: min(400px, 85vw);
+    margin-top: clamp(1.75rem, 4vh, 3rem);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  #app-loader .progress-info {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-align: right;
+  }
+
+  #app-loader .progress-percent {
+    color: var(--primary);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+
+  #app-loader .splash-load-track {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  #app-loader .splash-load-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--secondary), var(--primary));
+    box-shadow: var(--glow);
+    border-radius: 4px;
+    transition: width 0.28s ease;
+  }
+
+  #app-loader .load-actions {
+    margin-top: clamp(1.75rem, 4vh, 3rem);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    pointer-events: none;
+  }
+
+  #app-loader .load-actions.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  #app-loader .btn-enter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 36px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    background: var(--surface);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
+  }
+
+  #app-loader .btn-enter:hover {
+    background: rgba(0, 229, 255, 0.12);
+    border-color: var(--primary);
+    box-shadow: 0 0 22px rgba(0, 229, 255, 0.22);
+    transform: translateY(-2px);
+  }
 
   /* RESPONSIVE */
   @media(max-width:768px) {
@@ -302,11 +682,55 @@
     .slide { padding:20px; }
     .nav-btn { width:38px; height:38px; font-size:14px; }
     .tab-pane.active { grid-template-columns:1fr; }
-    #leafletMap { height: 260px; }
+    #slide-9.slide { padding: 44px 14px 88px; }
+    #slide-9 .map-slide-layout { width: calc(100vw - 28px); max-width: calc(100vw - 28px); }
+    #slide-9 .map-wrapper-main { min-height: clamp(240px, 42vh, 400px); }
+    .map-wrapper { min-height: 260px; }
+    #leafletMap { height: 260px; min-height: 260px; }
+    #slide-9 #leafletMap {
+      height: clamp(240px, 42vh, 420px);
+      min-height: clamp(240px, 42vh, 420px);
+    }
+
+    #app-loader .splash-brain-logo {
+      font-size: clamp(2.4rem, 12vmin, 3.85rem);
+    }
+    #app-loader .ai-core {
+      width: clamp(100px, 36vmin, 150px);
+      height: clamp(100px, 36vmin, 150px);
+    }
   }
 </style>
 </head>
 <body>
+
+<div id="app-loader" class="app-loader" role="status" aria-live="polite" aria-busy="true">
+  <main class="load-screen">
+    <div class="ai-core" aria-hidden="true">
+      <div class="ai-core-ring ring-1"></div>
+      <div class="ai-core-ring ring-2"></div>
+      <span class="splash-brain-logo" aria-hidden="true">🧠</span>
+    </div>
+
+    <span class="load-badge">نظام العرض 2026</span>
+    <h1 class="load-title"><span class="gradient">الذكاء الاصطناعي</span></h1>
+    <h2 class="load-subtitle">والجرائم الإلكترونية الحديثة</h2>
+
+    <div class="progress-wrapper">
+      <div class="progress-info">
+        <span id="splashStatusText">تهيئة البيانات...</span>
+        <span class="progress-percent" id="splashPercentText">0%</span>
+      </div>
+      <div class="splash-load-track">
+        <div class="splash-load-fill" id="splashProgressFill"></div>
+      </div>
+    </div>
+
+    <div class="load-actions" id="splashActionContainer">
+      <button type="button" class="btn-enter" id="splashEnterBtn">بدء العرض</button>
+    </div>
+  </main>
+</div>
 
 <button class="nav-btn nav-prev" onclick="changeSlide(-1)" title="السابق">&#8249;</button>
 <button class="nav-btn nav-next" onclick="changeSlide(1)"  title="التالي">&#8250;</button>
@@ -349,10 +773,10 @@
     <div class="grid-2" style="max-width:860px;">
       <div class="card" style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:1.6rem">🤖</span><div><h3 style="color:var(--primary)">مفهوم الذكاء الاصطناعي</h3><p style="color:var(--text-muted)">كيف يعمل ولماذا أصبح سلاحاً ذا حدين</p></div></div>
       <div class="card" style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:1.6rem">💀</span><div><h3 style="color:var(--accent)">الجرائم الإلكترونية</h3><p style="color:var(--text-muted)">تعريفها وأبرز أنواعها مع أرقام 2026</p></div></div>
-      <div class="card" style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:1.6rem">⚡</span><div><h3 style="color:#b57bff">كيف يُستغل الذكاء الاصطناعي</h3><p style="color:var(--text-muted)">التقنيات الحديثة في يد المجرمين</p></div></div>
+      <div class="card" style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:1.6rem">⚡</span><div><h3 style="color:var(--secondary-soft)">كيف يُستغل الذكاء الاصطناعي</h3><p style="color:var(--text-muted)">التقنيات الحديثة في يد المجرمين</p></div></div>
       <div class="card" style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:1.6rem">📋</span><div><h3 style="color:var(--primary)">سيناريوهات واقعية</h3><p style="color:var(--text-muted)">حوادث حقيقية لاختراقات بالذكاء الاصطناعي</p></div></div>
       <div class="card card-danger" style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:1.6rem">🗺️</span><div><h3 style="color:var(--accent)">خريطة التهديدات الحية</h3><p style="color:var(--text-muted)">عرض تفاعلي لمناطق الهجمات في الوقت الفعلي</p></div></div>
-      <div class="card card-purple" style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:1.6rem">🔐</span><div><h3 style="color:#b57bff">دليل الحماية التفاعلي</h3><p style="color:var(--text-muted)">Zero Trust والدفاع بالذكاء الاصطناعي</p></div></div>
+      <div class="card card-purple" style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:1.6rem">🔐</span><div><h3 style="color:var(--secondary-soft)">دليل الحماية التفاعلي</h3><p style="color:var(--text-muted)">Zero Trust والدفاع بالذكاء الاصطناعي</p></div></div>
     </div>
   </div>
 </div>
@@ -510,13 +934,21 @@
 
 <!-- ══ 9 – LEAFLET THREAT MAP ════════════════════════════════════════ -->
 <div class="slide" id="slide-9">
-  <div class="slide-inner">
-    <span class="badge badge-cyan">لوحة التهديدات — تفاعلية</span>
-    <h2>خريطة <span class="gradient-text">الهجمات الإلكترونية</span> الحية</h2>
+  <div class="slide-inner map-slide-layout">
+    <header class="map-slide-header">
+      <span class="badge badge-cyan">لوحة التهديدات — تفاعلية</span>
+      <h2>خريطة <span class="gradient-text">الهجمات الإلكترونية</span> الحية</h2>
+    </header>
     <div class="divider"></div>
 
-    <!-- Live counters -->
-    <div class="live-counters">
+    <!-- الخريطة أولاً وبأكبر مساحة ممكنة -->
+    <div class="map-wrapper map-wrapper-main">
+      <div id="leafletMap"></div>
+    </div>
+
+    <!-- عدادات مضغوطة تحت الخريطة -->
+    <div class="map-slide-bottom">
+    <div class="live-counters map-slide-counters">
       <div class="counter-box">
         <div class="counter-val" id="cnt-phish">0</div>
         <div class="counter-lbl">هجمة تصيد / دقيقة</div>
@@ -526,7 +958,7 @@
         <div class="counter-lbl">Deepfake محاولة / ساعة</div>
       </div>
       <div class="counter-box">
-        <div class="counter-val" id="cnt-ransom" style="color:#b57bff">0</div>
+        <div class="counter-val" id="cnt-ransom" style="color:var(--secondary-soft)">0</div>
         <div class="counter-lbl">برنامج فدية نشط</div>
       </div>
       <div class="counter-box">
@@ -535,21 +967,16 @@
       </div>
     </div>
 
-    <!-- Leaflet Map -->
-    <div class="map-wrapper">
-      <div id="leafletMap" style="width:100%;height:340px;min-height:340px;background:#070e22;"></div>
-    </div>
-
-    <!-- Legend -->
-    <div class="map-legend">
+    <div class="map-legend map-slide-legend">
       <div class="legend-item"><div class="legend-dot" style="background:#ff4757"></div>AI Phishing / Fraud</div>
       <div class="legend-item"><div class="legend-dot" style="background:#ffd740"></div>Deepfake</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#00d4ff"></div>Agentic AI</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#b57bff"></div>State Actor / APT</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--primary)"></div>Agentic AI</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--secondary-soft)"></div>State Actor / APT</div>
       <div class="legend-item"><div class="legend-dot" style="background:#ff8c00"></div>Ransomware</div>
       <div class="legend-item"><div class="legend-dot" style="background:#10B981"></div>Supply Chain</div>
     </div>
-    <p style="color:var(--text-muted);font-size:.75rem;">انقر على أي نقطة لمزيد من التفاصيل • الخريطة تعمل بـ Leaflet + CartoDB Dark Matter</p>
+    <p class="map-slide-footnote" style="color:var(--text-muted);">انقر على أي نقطة لمزيد من التفاصيل • Leaflet + OpenStreetMap (مظهر داكن بالتصفية على البلاط)</p>
+    </div>
   </div>
 </div>
 
@@ -643,7 +1070,7 @@
     <h2 style="max-width:700px;text-align:center;">الذكاء الاصطناعي <span class="gradient-text">سلاح ذو حدين</span></h2>
     <div class="divider"></div>
     <div class="grid-2" style="max-width:860px;margin-bottom:14px;">
-      <div class="card" style="border-color:rgba(0,212,255,.4);text-align:center"><span style="font-size:2.5rem">🌟</span><h3 style="color:var(--primary);margin:8px 0;">الجانب المضيء</h3><p style="color:var(--text-muted)">تطور علمي وطبي وأمني غير مسبوق.</p></div>
+      <div class="card" style="border-color:rgba(0,229,255,.4);text-align:center"><span style="font-size:2.5rem">🌟</span><h3 style="color:var(--primary);margin:8px 0;">الجانب المضيء</h3><p style="color:var(--text-muted)">تطور علمي وطبي وأمني غير مسبوق.</p></div>
       <div class="card card-danger" style="text-align:center"><span style="font-size:2.5rem">☠️</span><h3 style="color:var(--accent);margin:8px 0;">الجانب المظلم</h3><p style="color:var(--text-muted)">جرائم أكثر تعقيداً وأسرع تنفيذاً.</p></div>
     </div>
     <div class="quote-box" style="text-align:center;border-right:none;border-bottom:4px solid var(--primary);border-radius:12px 12px 0 0;">"الوعي الرقمي والأمن السيبراني لم يعودا ترفاً — بل ضرورة وجودية لحماية الأفراد والمؤسسات والدول"</div>
@@ -665,7 +1092,7 @@
 </div><!-- end slides-container -->
 
 <!-- Leaflet JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
 
 <script>
 /* ══════════════════════════════════════════════
@@ -684,9 +1111,10 @@ for (let i = 0; i < TOTAL; i++) {
 
 function goTo(n) {
   const slides = document.querySelectorAll('.slide');
-  slides[current].classList.remove('active');
-  slides[current].classList.add('exit');
-  setTimeout(() => slides[current].classList.remove('exit'), 600);
+  const prev = current;
+  slides[prev].classList.remove('active');
+  slides[prev].classList.add('exit');
+  setTimeout(() => slides[prev].classList.remove('exit'), 600);
   current = ((n % TOTAL) + TOTAL) % TOTAL;
   slides[current].classList.add('active');
   document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i === current));
@@ -695,11 +1123,17 @@ function goTo(n) {
 
   if (current === 9) {
     startCounters();
-    // Slide transition = 550ms — fire invalidateSize at multiple points
-    setTimeout(initLeafletMap, 100);
-    setTimeout(initLeafletMap, 400);
-    setTimeout(initLeafletMap, 700);
-    setTimeout(initLeafletMap, 1200);
+    const bumpMap = () => {
+      initLeafletMap();
+      if (_mapInstance) {
+        _mapInstance.invalidateSize({ animate: false });
+      }
+    };
+    requestAnimationFrame(() => requestAnimationFrame(bumpMap));
+    setTimeout(bumpMap, 100);
+    setTimeout(bumpMap, 400);
+    setTimeout(bumpMap, 650);
+    setTimeout(bumpMap, 1200);
   }
 }
 
@@ -738,11 +1172,17 @@ function checkQ(el, group, correct) {
    LEAFLET MAP — SLIDE 9
 ══════════════════════════════════════════════ */
 let _mapInstance = null;
-let _mapReady    = false;
+let _mapCreating = false;
 
 function initLeafletMap() {
   const container = document.getElementById('leafletMap');
-  if (!container) return;
+  if (!container || typeof L === 'undefined') return;
+
+  const rect = container.getBoundingClientRect();
+  if (rect.width < 2 || rect.height < 2) {
+    /* الحاوية غير جاهبة بعد (انتقال/تخطيط) — سيُعاد الاستدعاء من goTo / ResizeObserver */
+    return;
+  }
 
   /* If already built, just refresh size */
   if (_mapInstance) {
@@ -750,36 +1190,45 @@ function initLeafletMap() {
     return;
   }
 
-  /* Guard: don't double-init */
-  if (_mapReady) return;
-  _mapReady = true;
+  if (_mapCreating) return;
+  _mapCreating = true;
 
-  const map = L.map('leafletMap', {
-    center: [25, 15],
-    zoom: 2,
-    minZoom: 1,
-    maxZoom: 5,
-    zoomControl: true,
-    attributionControl: true,
-    scrollWheelZoom: false,
-    doubleClickZoom: false,
-    worldCopyJump: false
-  });
+  let map;
+  try {
+    map = L.map('leafletMap', {
+      center: [25, 15],
+      zoom: 2,
+      minZoom: 1,
+      maxZoom: 5,
+      zoomControl: true,
+      attributionControl: true,
+      scrollWheelZoom: false,
+      doubleClickZoom: false,
+      worldCopyJump: true
+    });
+  } finally {
+    _mapCreating = false;
+  }
   _mapInstance = map;
 
-  /* CartoDB Dark Matter — professional dark basemap */
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_matter/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://carto.com">CARTO</a>',
-    subdomains: 'abcd',
-    maxZoom: 20
+  map.whenReady(() => {
+    map.invalidateSize({ animate: false });
+    requestAnimationFrame(() => map.invalidateSize({ animate: false }));
+  });
+
+  /* OpenStreetMap — يعمل في أغلب البيئات؛ مظهر داكن عبر filter في CSS */
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    subdomains: 'abc',
+    maxZoom: 19
   }).addTo(map);
 
   /* ── City data ── */
   const cities = [
     { id:'ny',  name:'نيويورك',             lat:40.71,  lng:-74.00,  type:'AI Phishing',             count:'1,240 هجمة / دقيقة',     color:'#ff4757', role:'target'  },
     { id:'lon', name:'لندن',                lat:51.51,  lng:-0.12,   type:'Deepfake & CEO Fraud',     count:'380 محاولة / ساعة',       color:'#ffd740', role:'target'  },
-    { id:'msc', name:'موسكو',               lat:55.75,  lng:37.62,   type:'APT / State Actor',        count:'52 عملية نشطة',           color:'#b57bff', role:'source'  },
-    { id:'bj',  name:'بكين',                lat:39.91,  lng:116.39,  type:'Agentic AI Attack',        count:'890 وكيل نشط',            color:'#00d4ff', role:'source'  },
+    { id:'msc', name:'موسكو',               lat:55.75,  lng:37.62,   type:'APT / State Actor',        count:'52 عملية نشطة',           color:'#b388ff', role:'source'  },
+    { id:'bj',  name:'بكين',                lat:39.91,  lng:116.39,  type:'Agentic AI Attack',        count:'890 وكيل نشط',            color:'#00e5ff', role:'source'  },
     { id:'me',  name:'الشرق الأوسط',        lat:24.69,  lng:46.72,   type:'Ransomware-as-a-Service',  count:'120 مؤسسة مستهدفة',      color:'#ff8c00', role:'target'  },
     { id:'ng',  name:'نيجيريا',             lat:6.45,   lng:3.39,    type:'Fraud-as-a-Service',       count:'640 حملة / يوم',          color:'#ff4757', role:'source'  },
     { id:'sg',  name:'سنغافورة',            lat:1.35,   lng:103.82,  type:'Supply Chain Attack',      count:'34 مؤسسة',               color:'#10B981', role:'source'  },
@@ -818,11 +1267,13 @@ function initLeafletMap() {
 
     /* Apply CSS animation to the SVG path Leaflet creates */
     setTimeout(() => {
-      const el = poly.getElement();
-      if (el) {
-        el.classList.add('attack-anim');
-        el.style.animationDuration = (1.8 + Math.random() * 1.2) + 's';
-      }
+      try {
+        const el = poly.getElement && poly.getElement();
+        if (el) {
+          el.classList.add('attack-anim');
+          el.style.animationDuration = (1.8 + Math.random() * 1.2) + 's';
+        }
+      } catch (_) { /* Canvas renderer أو إصدارات بدون getElement */ }
     }, 200);
   });
 
@@ -860,10 +1311,9 @@ function initLeafletMap() {
       .bindPopup(popup);
   });
 
-  /* Fix size after transition finishes */
-  setTimeout(() => map.invalidateSize({ animate:false }), 200);
-  setTimeout(() => map.invalidateSize({ animate:false }), 600);
-  setTimeout(() => map.invalidateSize({ animate:false }), 1000);
+  setTimeout(() => map.invalidateSize({ animate: false }), 200);
+  setTimeout(() => map.invalidateSize({ animate: false }), 600);
+  setTimeout(() => map.invalidateSize({ animate: false }), 1000);
 }
 
 /* ══════════════════════════════════════════════
@@ -925,6 +1375,94 @@ function updateProgress() {
   document.getElementById('progressText').textContent  = done.length + ' / ' + items.length + ' مكتمل';
 }
 updateProgress();
+
+/* بعد انتهاء انتقال الشريحة أو تغيّر حجم الحاوية: Leaflet يحتاج invalidateSize */
+(function setupMapObservers() {
+  const slide9 = document.getElementById('slide-9');
+  const mapEl = document.getElementById('leafletMap');
+  if (!slide9 || !mapEl) return;
+
+  slide9.addEventListener('transitionend', (e) => {
+    if (e.propertyName !== 'opacity' && e.propertyName !== 'transform') return;
+    if (!slide9.classList.contains('active')) return;
+    if (_mapInstance) _mapInstance.invalidateSize({ animate: false });
+    else initLeafletMap();
+  });
+
+  if (window.ResizeObserver) {
+    new ResizeObserver(() => {
+      if (!slide9.classList.contains('active')) return;
+      if (_mapInstance) _mapInstance.invalidateSize({ animate: false });
+      else initLeafletMap();
+    }).observe(mapEl);
+  }
+})();
+
+(function initSplashLoader() {
+  const root = document.getElementById('app-loader');
+  if (!root) return;
+
+  const statusText = document.getElementById('splashStatusText');
+  const percentText = document.getElementById('splashPercentText');
+  const progressFill = document.getElementById('splashProgressFill');
+  const actionContainer = document.getElementById('splashActionContainer');
+  const enterBtn = document.getElementById('splashEnterBtn');
+
+  const loadingStages = [
+    { progress: 20, text: 'تحميل النماذج الأمنية...' },
+    { progress: 55, text: 'تشفير الاتصال...' },
+    { progress: 85, text: 'تجهيز الواجهة الرسومية...' },
+    { progress: 100, text: 'النظام جاهز' }
+  ];
+
+  let dismissTimer = null;
+  let simTimer = null;
+
+  function dismiss() {
+    if (root.classList.contains('is-done')) return;
+    clearInterval(simTimer);
+    clearTimeout(dismissTimer);
+    root.classList.add('is-done');
+    root.setAttribute('aria-busy', 'false');
+    setTimeout(() => root.remove(), 560);
+  }
+
+  let currentProgress = 0;
+  let stageIndex = 0;
+
+  simTimer = setInterval(() => {
+    currentProgress += Math.floor(Math.random() * 5) + 1;
+
+    if (currentProgress >= loadingStages[stageIndex].progress) {
+      if (statusText) statusText.textContent = loadingStages[stageIndex].text;
+      if (stageIndex < loadingStages.length - 1) stageIndex++;
+    }
+
+    if (currentProgress >= 100) {
+      currentProgress = 100;
+      clearInterval(simTimer);
+      simTimer = null;
+      if (percentText) percentText.textContent = '100%';
+      if (progressFill) progressFill.style.width = '100%';
+      if (statusText) statusText.textContent = loadingStages[loadingStages.length - 1].text;
+      if (actionContainer) actionContainer.classList.add('show');
+      dismissTimer = setTimeout(dismiss, 2000);
+      return;
+    }
+
+    if (percentText) percentText.textContent = currentProgress + '%';
+    if (progressFill) progressFill.style.width = currentProgress + '%';
+  }, 80);
+
+  if (enterBtn) {
+    enterBtn.addEventListener('click', () => {
+      if (!actionContainer || !actionContainer.classList.contains('show')) return;
+      if (statusText) statusText.textContent = 'جاري الدخول...';
+      clearTimeout(dismissTimer);
+      dismiss();
+    });
+  }
+})();
 </script>
 </body>
 </html>
