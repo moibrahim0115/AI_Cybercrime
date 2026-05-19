@@ -765,6 +765,47 @@
       height: clamp(100px, 36vmin, 150px);
     }
   }
+
+  /* ── ZOOM LENS — slide-13 images ── */
+  .zoom-wrap {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    cursor: crosshair;
+    width: 100%;
+  }
+  .zoom-wrap img {
+    display: block;
+    width: 100%;
+    border-radius: 10px;
+    object-fit: contain;
+    max-height: 400px;
+    transition: transform 0.1s ease;
+    transform-origin: var(--ox, 50%) var(--oy, 50%);
+  }
+  .zoom-wrap:hover img {
+    transform: scale(2.2);
+  }
+  .zoom-wrap::after {
+    content: '🔍';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 1.2rem;
+    background: rgba(0,0,0,0.5);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .zoom-wrap:hover::after {
+    opacity: 1;
+  }
 </style>
 </head>
 <body>
@@ -801,7 +842,7 @@
 
 <button class="nav-btn nav-prev" onclick="changeSlide(-1)" title="السابق">&#8249;</button>
 <button class="nav-btn nav-next" onclick="changeSlide(1)"  title="التالي">&#8250;</button>
-<div class="slide-num" id="slideNum">01 / 14</div>
+<div class="slide-num" id="slideNum">01 / 15</div>
 <div class="key-hint">→ التالي &nbsp;|&nbsp; ← السابق</div>
 
 <div class="slide-logo-watermark" id="slideLogo" aria-hidden="true">
@@ -1139,8 +1180,45 @@
   </div>
 </div>
 
-<!-- ══ 13 – CONCLUSION ════════════════════════════════════════════════ -->
+<!-- ══ 13 – MEDIA MONITORING — AI FACE UNBLUR ════════════════════════ -->
 <div class="slide" id="slide-13">
+  <div class="slide-inner">
+    <span class="badge badge-red">رصد قطاع الإعلام والعلاقات</span>
+    <h2>التلاعب بصور الموقوفين <span class="gradient-text">بالذكاء الاصطناعي</span></h2>
+    <div class="divider"></div>
+
+    <div class="warning-band" style="max-width:920px;">
+      <span style="font-size:1.4rem">👁️</span>
+      <p style="font-size:.82rem;line-height:1.8;">
+        رُصد حساب بإسم <strong style="color:var(--accent)">«الشبح»</strong> على (فيس بوك – إنستجرام – ثريدز – يوتيوب)، يُعيد تداول صور الموقوفين
+        المنشورة عبر <strong style="color:var(--primary)">الصفحة الرسمية لوزارة الداخلية</strong>، عقب تعديلها بالذكاء الاصطناعي لإزالة التمويه عن الوجوه
+        ونشرها بوجوه أشخاص آخرين غير المقبوض عليهم — مع عناوين مثيرة بقصد زيادة أعداد المتابعين.
+      </p>
+    </div>
+
+    <div class="grid-2" style="max-width:1100px;margin-top:4px;gap:20px;">
+      <div class="card" style="padding:12px;display:flex;flex-direction:column;gap:10px;align-items:center;">
+        <div class="zoom-wrap" id="zoom1">
+          <img src="ai 1.png" alt="واقعة أولى">
+        </div>
+        <p style="font-size:.78rem;color:var(--text-muted);text-align:center;">واقعة ١ — صورة أصلية (ممُوّهة) مقابل صورة مُعدَّلة بالذكاء الاصطناعي</p>
+      </div>
+      <div class="card" style="padding:12px;display:flex;flex-direction:column;gap:10px;align-items:center;">
+        <div class="zoom-wrap" id="zoom2">
+          <img src="ai 2.png" alt="واقعة ثانية">
+        </div>
+        <p style="font-size:.78rem;color:var(--text-muted);text-align:center;">واقعة ٢ — نفس الأسلوب مُكرَّر في حالات متعددة بدأت تتصاعد مؤخراً</p>
+      </div>
+    </div>
+
+    <div class="quote-box" style="max-width:900px;">
+      ⚠️ هذه الوقائع <strong>تجربة واقعية مباشرة</strong> من عمل القطاع — توظيف الذكاء الاصطناعي في الإضرار بأشخاص أبرياء عبر نسب وجوههم لجرائم لم يرتكبوها، وهو ما يُعدّ جريمة إلكترونية موثّقة.
+    </div>
+  </div>
+</div>
+
+<!-- ══ 14 – CONCLUSION ════════════════════════════════════════════════ -->
+<div class="slide" id="slide-14">
   <div class="slide-inner" style="text-align:center;align-items:center;">
     <span class="badge badge-cyan">الخاتمة</span>
     <h2 style="max-width:700px;text-align:center;">الذكاء الاصطناعي <span class="gradient-text">سلاح ذو حدين</span></h2>
@@ -1174,7 +1252,7 @@
 /* ══════════════════════════════════════════════
    SLIDE ENGINE
 ══════════════════════════════════════════════ */
-const TOTAL = 14;
+const TOTAL = 15;
 let current = 0;
 
 const dotsEl = document.getElementById('dots');
@@ -1547,6 +1625,20 @@ updateProgress();
     });
   }
 })();
+/* ── ZOOM LENS — slide-13 ── */
+document.querySelectorAll('.zoom-wrap').forEach(wrap => {
+  wrap.addEventListener('mousemove', e => {
+    const r = wrap.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width  * 100).toFixed(1) + '%';
+    const y = ((e.clientY - r.top)  / r.height * 100).toFixed(1) + '%';
+    wrap.style.setProperty('--ox', x);
+    wrap.style.setProperty('--oy', y);
+  });
+  wrap.addEventListener('mouseleave', () => {
+    wrap.style.setProperty('--ox', '50%');
+    wrap.style.setProperty('--oy', '50%');
+  });
+});
 </script>
 </body>
 </html>
