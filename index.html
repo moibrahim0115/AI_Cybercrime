@@ -128,8 +128,59 @@
 
   /* ── COVER ── */
   #slide-0 { text-align:center; background:radial-gradient(ellipse at center,rgba(0,229,255,.056) 0%,transparent 72%); }
-  .pulse-ring { width:100px; height:100px; border-radius:50%; border:2px solid var(--primary); display:flex; align-items:center; justify-content:center; margin:0 auto 20px; animation:ring 2s ease infinite; }
-  @keyframes ring { 0%{box-shadow:0 0 0 0 rgba(0,229,255,.42)} 70%{box-shadow:0 0 0 18px rgba(0,229,255,0)} 100%{box-shadow:0 0 0 0 rgba(0,229,255,0)} }
+
+  /* لوجو دائري — إطار يقص الزوايا المربعة للصورة */
+  .logo-frame {
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+    aspect-ratio: 1;
+    isolation: isolate;
+  }
+
+  .logo-frame .site-logo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    object-fit: cover;
+    object-position: center center;
+    transform: scale(1.26);
+    background: transparent;
+  }
+
+  #slide-0 .logo-frame.cover-logo {
+    width: clamp(160px, 26vw, 240px);
+    height: clamp(160px, 26vw, 240px);
+    margin: 0 auto clamp(18px, 3vh, 28px);
+    box-shadow: 0 0 32px rgba(0, 229, 255, 0.18), 0 0 48px rgba(112, 0, 255, 0.12);
+  }
+
+  /* لوجو الشرائح 2–14: ثابت في الزاوية (الطرف) */
+  .slide-logo-watermark {
+    position: fixed;
+    z-index: 95;
+    pointer-events: none;
+    top: clamp(54px, 8vh, 76px);
+    left: clamp(16px, 3.2vw, 32px);
+    right: auto;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.45s ease, visibility 0.45s;
+  }
+
+  .slide-logo-watermark.is-visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .logo-frame--edge {
+    width: clamp(52px, 7.5vw, 76px);
+    height: clamp(52px, 7.5vw, 76px);
+    box-shadow: 0 0 18px rgba(0, 229, 255, 0.14), 0 0 28px rgba(112, 0, 255, 0.1);
+    opacity: 0.92;
+  }
 
   /* ── PRESENTER ── */
   .presenter-item { text-align:center; background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:16px 32px; backdrop-filter:blur(5px); transition:all .3s; }
@@ -444,7 +495,7 @@
   .quiz-choice.correct { border-color:var(--green); background:rgba(16,185,129,.1); }
   .quiz-choice.wrong   { border-color:var(--accent); background:rgba(255,71,87,.1); }
 
-  /* ── SPLASH / تحميل — شبكة وبؤرة وبنفسجي مثل الواجهة العامة + لوجو الدماغ 🧠 ── */
+  /* ── SPLASH / تحميل — شبكة وبؤرة + لوجو دائري ── */
   #app-loader {
     position: fixed;
     inset: 0;
@@ -540,18 +591,18 @@
     animation: splashSpinSlow 2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite reverse;
   }
 
-  #app-loader .splash-brain-logo {
+  #app-loader .logo-frame {
     position: relative;
     z-index: 2;
-    font-size: clamp(2.85rem, 11vmin, 4.85rem);
-    line-height: 1;
-    filter: drop-shadow(0 0 18px rgba(0, 229, 255, 0.5)) drop-shadow(0 0 28px rgba(112, 0, 255, 0.38));
-    animation: splashBrainPulse 2.2s ease-in-out infinite alternate;
+    width: clamp(100px, 20vmin, 150px);
+    height: clamp(100px, 20vmin, 150px);
+    box-shadow: 0 0 24px rgba(0, 229, 255, 0.3), 0 0 40px rgba(112, 0, 255, 0.18);
+    animation: splashLogoPulse 2.2s ease-in-out infinite alternate;
   }
 
-  @keyframes splashBrainPulse {
-    0% { transform: scale(0.94); opacity: 0.9; }
-    100% { transform: scale(1.06); opacity: 1; }
+  @keyframes splashLogoPulse {
+    0% { transform: scale(0.94); opacity: 0.92; }
+    100% { transform: scale(1.04); opacity: 1; }
   }
 
   @keyframes splashSpinSlow {
@@ -692,8 +743,22 @@
       min-height: clamp(240px, 42vh, 420px);
     }
 
-    #app-loader .splash-brain-logo {
-      font-size: clamp(2.4rem, 12vmin, 3.85rem);
+    #app-loader .logo-frame {
+      width: clamp(88px, 22vmin, 128px);
+      height: clamp(88px, 22vmin, 128px);
+    }
+    #slide-0 .logo-frame.cover-logo {
+      width: clamp(140px, 34vw, 200px);
+      height: clamp(140px, 34vw, 200px);
+    }
+    .logo-frame--edge {
+      width: clamp(46px, 11vw, 64px);
+      height: clamp(46px, 11vw, 64px);
+    }
+    .slide-logo-watermark {
+      top: clamp(48px, 7vh, 62px);
+      left: clamp(10px, 2.5vw, 18px);
+      right: auto;
     }
     #app-loader .ai-core {
       width: clamp(100px, 36vmin, 150px);
@@ -709,7 +774,9 @@
     <div class="ai-core" aria-hidden="true">
       <div class="ai-core-ring ring-1"></div>
       <div class="ai-core-ring ring-2"></div>
-      <span class="splash-brain-logo" aria-hidden="true">🧠</span>
+      <div class="logo-frame">
+        <img src="logo.jpg" alt="شعار جمهورية مصر العربية" class="site-logo" width="150" height="150">
+      </div>
     </div>
 
     <span class="load-badge">نظام العرض 2026</span>
@@ -736,13 +803,22 @@
 <button class="nav-btn nav-next" onclick="changeSlide(1)"  title="التالي">&#8250;</button>
 <div class="slide-num" id="slideNum">01 / 14</div>
 <div class="key-hint">→ التالي &nbsp;|&nbsp; ← السابق</div>
+
+<div class="slide-logo-watermark" id="slideLogo" aria-hidden="true">
+  <div class="logo-frame logo-frame--edge" id="slideLogoFrame">
+    <img src="logo.jpg" alt="" class="site-logo" width="76" height="76">
+  </div>
+</div>
+
 <div class="slide-counter" id="dots"></div>
 
 <div class="slides-container">
 
 <!-- ══ 0 – COVER ═══════════════════════════════════════════════════ -->
 <div class="slide active" id="slide-0">
-  <div class="pulse-ring"><span style="font-size:2.5rem">🧠</span></div>
+  <div class="logo-frame cover-logo">
+    <img src="logo.jpg" alt="شعار جمهورية مصر العربية" class="site-logo" width="240" height="240">
+  </div>
   <span class="badge badge-cyan">محاضرة 2026 — تحديث مايو</span>
   <h1 style="text-align:center;max-width:800px;">
     الذكاء الاصطناعي<br>
@@ -1109,6 +1185,12 @@ for (let i = 0; i < TOTAL; i++) {
   dotsEl.appendChild(d);
 }
 
+function updateSlideLogo(n) {
+  const wm = document.getElementById('slideLogo');
+  if (!wm) return;
+  wm.classList.toggle('is-visible', n !== 0);
+}
+
 function goTo(n) {
   const slides = document.querySelectorAll('.slide');
   const prev = current;
@@ -1120,6 +1202,8 @@ function goTo(n) {
   document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i === current));
   document.getElementById('slideNum').textContent =
     String(current+1).padStart(2,'0') + ' / ' + String(TOTAL).padStart(2,'0');
+
+  updateSlideLogo(current);
 
   if (current === 9) {
     startCounters();
