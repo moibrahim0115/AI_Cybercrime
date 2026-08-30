@@ -117,7 +117,7 @@ body::after{
 @keyframes sceneIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
 .slidePad{
   position:absolute;inset:0;
-  padding:78px 72px 36px;
+  padding:78px 88px 36px;
   display:flex;justify-content:center;
   overflow-x:hidden;overflow-y:auto;
 }
@@ -295,9 +295,10 @@ h1{font-family:var(--font-display);font-weight:900;line-height:1.22;}
 .list{list-style:none;}
 .list li{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;margin-bottom:8px;background:rgba(18,22,31,.8);border:1px solid var(--border);border-inline-start:2px solid var(--accent);border-radius:var(--radius-sm);font-size:14px;min-width:0;}
 .rail{display:flex;flex-direction:column;gap:10px;width:100%;max-width:980px;margin-inline:auto;}
-.rail-row{display:flex;gap:14px;align-items:stretch;}
-.rail-row > *{min-width:0;}
-.rail-row .card{padding:14px 18px;}
+.rail-card{display:flex;align-items:flex-start;gap:14px;padding:14px 18px;width:100%;}
+.rail-card .iconWrap{flex:0 0 42px;width:42px;height:42px;min-width:42px;max-width:42px;margin-bottom:0;overflow:hidden;}
+.rail-body{flex:1 1 0%;min-width:0;}
+.rail-body h3,.rail-body p{overflow-wrap:break-word;word-break:normal;}
 .agenda-card{display:flex;gap:14px;align-items:flex-start;}
 .agenda-card h3{margin-bottom:4px;}
 .coverSeal{width:clamp(168px,19vw,228px);height:clamp(168px,19vw,228px);margin:0 auto 18px;}
@@ -357,7 +358,7 @@ h1{font-family:var(--font-display);font-weight:900;line-height:1.22;}
   .presenterGrid{grid-template-columns:1fr;gap:30px;}
   .presenterPhoto{max-width:200px;}
   .cover{padding:68px 18px 28px;}
-  .slidePad{padding:68px 56px 80px;}
+  .slidePad{padding:68px 68px 80px;}
   .slidePad .inner,.slidePad .inner.wide{width:100%;}
   .tab-pane.active{grid-template-columns:1fr;}
   .navArrow{width:42px;height:42px;}
@@ -384,7 +385,7 @@ h1{font-family:var(--font-display);font-weight:900;line-height:1.22;}
   .slidePad{padding-top:68px;padding-bottom:24px;}
   .slidePad h1{font-size:clamp(26px,3vw,38px);margin-bottom:12px;}
   .rail{gap:8px;}
-  .rail-row .card,.card{padding:12px 14px;}
+  .rail-card,.card{padding:12px 14px;}
   .kicker{margin-bottom:6px;}
 }
 </style>
@@ -502,11 +503,11 @@ h1{font-family:var(--font-display);font-weight:900;line-height:1.22;}
         <div class="kicker">القسم الثالث</div>
         <h1>كيف يُستغل الذكاء الاصطناعي في الجرائم؟</h1>
         <div class="rail">
-          <div class="rail-row"><span class="iconWrap" data-icon="film"></span><div class="card" style="flex:1"><h3>تقنية Deepfake</h3><p>توليد فيديوهات وأصوات مقنعة — ارتفعت بنسبة 3000% بين 2022 و2025</p></div></div>
-          <div class="rail-row"><span class="iconWrap" data-icon="mail"></span><div class="card" style="flex:1"><h3>AI Phishing</h3><p>رسائل مُخصصة بمعدل نجاح 89% مقابل 53% للتصيد التقليدي</p></div></div>
-          <div class="rail-row"><span class="iconWrap" data-icon="bug"></span><div class="card" style="flex:1"><h3>البرمجيات الخبيثة الذكية</h3><p>كود يعيد كتابة توقيعه كل 4 ثوانٍ ليتهرب من الحماية</p></div></div>
-          <div class="rail-row"><span class="iconWrap" data-icon="fingerprint"></span><div class="card" style="flex:1"><h3>الهويات الاصطناعية</h3><p>تجميع بيانات مسروقة لبناء شخصيات كاملة تجتاز التحقق</p></div></div>
-          <div class="rail-row"><span class="iconWrap warn" data-icon="bot"></span><div class="card hl" style="flex:1"><h3>Agentic AI — الجديد في 2026</h3><p>وكلاء مستقلون يشنّون هجمات كاملة دون تدخل بشري في <strong style="color:var(--danger)">22 ثانية</strong></p></div></div>
+          <div class="card rail-card"><span class="iconWrap" data-icon="film"></span><div class="rail-body"><h3>تقنية Deepfake</h3><p>توليد فيديوهات وأصوات مقنعة — ارتفعت بنسبة 3000% بين 2022 و2025</p></div></div>
+          <div class="card rail-card"><span class="iconWrap" data-icon="mail"></span><div class="rail-body"><h3>AI Phishing</h3><p>رسائل مُخصصة بمعدل نجاح 89% مقابل 53% للتصيد التقليدي</p></div></div>
+          <div class="card rail-card"><span class="iconWrap" data-icon="bug"></span><div class="rail-body"><h3>البرمجيات الخبيثة الذكية</h3><p>كود يعيد كتابة توقيعه كل 4 ثوانٍ ليتهرب من الحماية</p></div></div>
+          <div class="card rail-card"><span class="iconWrap" data-icon="fingerprint"></span><div class="rail-body"><h3>الهويات الاصطناعية</h3><p>تجميع بيانات مسروقة لبناء شخصيات كاملة تجتاز التحقق</p></div></div>
+          <div class="card rail-card hl"><span class="iconWrap warn" data-icon="bot"></span><div class="rail-body"><h3>Agentic AI — الجديد في 2026</h3><p>وكلاء مستقلون يشنّون هجمات كاملة دون تدخل بشري في <strong style="color:var(--danger)">22 ثانية</strong></p></div></div>
         </div>
       </div></div>
     </section>
@@ -779,7 +780,7 @@ const ICONS = {
 };
 document.querySelectorAll('[data-icon]').forEach(el=>{
   const name = el.dataset.icon;
-  el.innerHTML = '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+(ICONS[name]||'')+'</svg>';
+  el.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+(ICONS[name]||'')+'</svg>';
 });
 
 const scenes = [...document.querySelectorAll('.scene')];
